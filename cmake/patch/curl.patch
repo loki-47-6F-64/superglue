@@ -1,0 +1,270 @@
+diff --git lib/curl_builder/packer.rb lib/curl_builder/packer.rb
+index 6dbf99a..abd1bbd 100644
+--- lib/curl_builder/packer.rb
++++ lib/curl_builder/packer.rb
+@@ -35,16 +35,17 @@ module CurlBuilder
+       if create_binary_for ios, "ios-dev"
+         successful["ios-dev"] = ios
+         copy_include_dir ios.first, "ios-dev"
++        `patch -p0 < post-build.patch`
+       end
+ 
+-      if create_binary_for arm, "ios-appstore"
+-        successful["ios-appstore"] = arm 
+-        copy_include_dir arm.first, "ios-appstore"
+-      end
+-
+-      if arm64.count > 0
+-        copy_include_dir arm64.first, "ios64-dev"
+-      end
++#      if create_binary_for arm, "ios-appstore"
++#        successful["ios-appstore"] = arm 
++#        copy_include_dir arm.first, "ios-appstore"
++#      end
++#
++#      if arm64.count > 0
++#        copy_include_dir arm64.first, "ios64-dev"
++#      end
+ 
+       successful
+     end
+diff --git lib/curl_builder/paths.rb lib/curl_builder/paths.rb
+index a934c3c..f676c9d 100644
+--- lib/curl_builder/paths.rb
++++ lib/curl_builder/paths.rb
+@@ -41,7 +41,7 @@ module CurlBuilder
+     end
+ 
+     def result_include_dir(name)
+-      File.join result_dir, name, "include"
++      File.join result_dir, name, "include/curl"
+     end
+ 
+     def packed_lib_path_with(name)
+diff --git post-build.patch post-build.patch
+new file mode 100644
+index 0000000..73b91b4
+--- /dev/null
++++ post-build.patch
+@@ -0,0 +1,221 @@
++diff -ur ios-dev-back/include/curl/curlbuild.h curl/ios-dev/include/curl/curlbuild.h
++--- ios-dev-back/include/curl/curlbuild.h	2015-05-18 11:50:33.000000000 +0200
+++++ curl/ios-dev/include/curl/curlbuild.h	2015-05-18 11:55:59.000000000 +0200
++@@ -124,75 +124,148 @@
++ #  include <ws2tcpip.h>
++ #endif
++ 
++-/* Configure process defines this to 1 when it finds out that system   */
++-/* header file sys/types.h must be included by the external interface. */
++-#define CURL_PULL_SYS_TYPES_H 1
++-#ifdef CURL_PULL_SYS_TYPES_H
++-#  include <sys/types.h>
+++#if __LP64__
+++  /* Configure process defines this to 1 when it finds out that system   */
+++  /* header file sys/types.h must be included by the external interface. */
+++  #define CURL_PULL_SYS_TYPES_H 1
+++  #ifdef CURL_PULL_SYS_TYPES_H
+++  #  include <sys/types.h>
+++  #endif
+++  
+++     /* Configure process defines this to 1 when it finds out that system */
+++     /* header file stdint.h must be included by the external interface.  */
+++     /* #undef CURL_PULL_STDINT_H */
+++  #ifdef CURL_PULL_STDINT_H
+++  #  include <stdint.h>
+++  #endif
+++  
+++     /* Configure process defines this to 1 when it finds out that system  */
+++     /* header file inttypes.h must be included by the external interface. */
+++     /* #undef CURL_PULL_INTTYPES_H */
+++  #ifdef CURL_PULL_INTTYPES_H
+++  #  include <inttypes.h>
+++  #endif
+++  
+++     /* Configure process defines this to 1 when it finds out that system    */
+++     /* header file sys/socket.h must be included by the external interface. */
+++  #define CURL_PULL_SYS_SOCKET_H 1
+++  #ifdef CURL_PULL_SYS_SOCKET_H
+++  #  include <sys/socket.h>
+++  #endif
+++  
+++     /* Configure process defines this to 1 when it finds out that system  */
+++     /* header file sys/poll.h must be included by the external interface. */
+++     /* #undef CURL_PULL_SYS_POLL_H */
+++  #ifdef CURL_PULL_SYS_POLL_H
+++  #  include <sys/poll.h>
+++  #endif
+++  
+++     /* The size of `long', as computed by sizeof. */
+++  #define CURL_SIZEOF_LONG 8
+++  
+++     /* Integral data type used for curl_socklen_t. */
+++  #define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
+++  
+++     /* The size of `curl_socklen_t', as computed by sizeof. */
+++  #define CURL_SIZEOF_CURL_SOCKLEN_T 4
+++  
+++     /* Data type definition of curl_socklen_t. */
+++     typedef CURL_TYPEOF_CURL_SOCKLEN_T curl_socklen_t;
+++  
+++     /* Signed integral data type used for curl_off_t. */
+++  #define CURL_TYPEOF_CURL_OFF_T long
+++  
+++     /* Data type definition of curl_off_t. */
+++     typedef CURL_TYPEOF_CURL_OFF_T curl_off_t;
+++  
+++     /* curl_off_t formatting string directive without "%" conversion specifier. */
+++  #define CURL_FORMAT_CURL_OFF_T "ld"
+++  
+++     /* unsigned curl_off_t formatting string without "%" conversion specifier. */
+++  #define CURL_FORMAT_CURL_OFF_TU "lu"
+++  
+++     /* curl_off_t formatting string directive with "%" conversion specifier. */
+++  #define CURL_FORMAT_OFF_T "%ld"
+++  
+++     /* The size of `curl_off_t', as computed by sizeof. */
+++  #define CURL_SIZEOF_CURL_OFF_T 8
+++  
+++     /* curl_off_t constant suffix. */
+++  #define CURL_SUFFIX_CURL_OFF_T L
+++  
+++     /* unsigned curl_off_t constant suffix. */
+++  #define CURL_SUFFIX_CURL_OFF_TU UL
+++#else
+++  /* Configure process defines this to 1 when it finds out that system   */
+++  /* header file sys/types.h must be included by the external interface. */
+++  #define CURL_PULL_SYS_TYPES_H 1
+++  #ifdef CURL_PULL_SYS_TYPES_H
+++  #  include <sys/types.h>
+++  #endif
+++  
+++  /* Configure process defines this to 1 when it finds out that system */
+++  /* header file stdint.h must be included by the external interface.  */
+++  #define CURL_PULL_STDINT_H 1
+++  #ifdef CURL_PULL_STDINT_H
+++  #  include <stdint.h>
+++  #endif
+++  
+++  /* Configure process defines this to 1 when it finds out that system  */
+++  /* header file inttypes.h must be included by the external interface. */
+++  #define CURL_PULL_INTTYPES_H 1
+++  #ifdef CURL_PULL_INTTYPES_H
+++  #  include <inttypes.h>
+++  #endif
+++  
+++  /* Configure process defines this to 1 when it finds out that system    */
+++  /* header file sys/socket.h must be included by the external interface. */
+++  #define CURL_PULL_SYS_SOCKET_H 1
+++  #ifdef CURL_PULL_SYS_SOCKET_H
+++  #  include <sys/socket.h>
+++  #endif
+++  
+++  /* Configure process defines this to 1 when it finds out that system  */
+++  /* header file sys/poll.h must be included by the external interface. */
+++  /* #undef CURL_PULL_SYS_POLL_H */
+++  #ifdef CURL_PULL_SYS_POLL_H
+++  #  include <sys/poll.h>
+++  #endif
+++  
+++  /* The size of `long', as computed by sizeof. */
+++  #define CURL_SIZEOF_LONG 4
+++  
+++  /* Integral data type used for curl_socklen_t. */
+++  #define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
+++  
+++  /* The size of `curl_socklen_t', as computed by sizeof. */
+++  #define CURL_SIZEOF_CURL_SOCKLEN_T 4
+++  
+++  /* Data type definition of curl_socklen_t. */
+++  typedef CURL_TYPEOF_CURL_SOCKLEN_T curl_socklen_t;
+++  
+++  /* Signed integral data type used for curl_off_t. */
+++  #define CURL_TYPEOF_CURL_OFF_T int64_t
+++  
+++  /* Data type definition of curl_off_t. */
+++  typedef CURL_TYPEOF_CURL_OFF_T curl_off_t;
+++  
+++  /* curl_off_t formatting string directive without "%" conversion specifier. */
+++  #define CURL_FORMAT_CURL_OFF_T "lld"
+++  
+++  /* unsigned curl_off_t formatting string without "%" conversion specifier. */
+++  #define CURL_FORMAT_CURL_OFF_TU "llu"
+++  
+++  /* curl_off_t formatting string directive with "%" conversion specifier. */
+++  #define CURL_FORMAT_OFF_T "%lld"
+++  
+++  /* The size of `curl_off_t', as computed by sizeof. */
+++  #define CURL_SIZEOF_CURL_OFF_T 8
+++  
+++  /* curl_off_t constant suffix. */
+++  #define CURL_SUFFIX_CURL_OFF_T LL
+++  
+++  /* unsigned curl_off_t constant suffix. */
+++  #define CURL_SUFFIX_CURL_OFF_TU ULL
++ #endif
++ 
++-/* Configure process defines this to 1 when it finds out that system */
++-/* header file stdint.h must be included by the external interface.  */
++-#define CURL_PULL_STDINT_H 1
++-#ifdef CURL_PULL_STDINT_H
++-#  include <stdint.h>
++-#endif
++-
++-/* Configure process defines this to 1 when it finds out that system  */
++-/* header file inttypes.h must be included by the external interface. */
++-#define CURL_PULL_INTTYPES_H 1
++-#ifdef CURL_PULL_INTTYPES_H
++-#  include <inttypes.h>
++-#endif
++-
++-/* Configure process defines this to 1 when it finds out that system    */
++-/* header file sys/socket.h must be included by the external interface. */
++-#define CURL_PULL_SYS_SOCKET_H 1
++-#ifdef CURL_PULL_SYS_SOCKET_H
++-#  include <sys/socket.h>
++-#endif
++-
++-/* Configure process defines this to 1 when it finds out that system  */
++-/* header file sys/poll.h must be included by the external interface. */
++-/* #undef CURL_PULL_SYS_POLL_H */
++-#ifdef CURL_PULL_SYS_POLL_H
++-#  include <sys/poll.h>
++-#endif
++-
++-/* The size of `long', as computed by sizeof. */
++-#define CURL_SIZEOF_LONG 4
++-
++-/* Integral data type used for curl_socklen_t. */
++-#define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
++-
++-/* The size of `curl_socklen_t', as computed by sizeof. */
++-#define CURL_SIZEOF_CURL_SOCKLEN_T 4
++-
++-/* Data type definition of curl_socklen_t. */
++-typedef CURL_TYPEOF_CURL_SOCKLEN_T curl_socklen_t;
++-
++-/* Signed integral data type used for curl_off_t. */
++-#define CURL_TYPEOF_CURL_OFF_T int64_t
++-
++-/* Data type definition of curl_off_t. */
++-typedef CURL_TYPEOF_CURL_OFF_T curl_off_t;
++-
++-/* curl_off_t formatting string directive without "%" conversion specifier. */
++-#define CURL_FORMAT_CURL_OFF_T "lld"
++-
++-/* unsigned curl_off_t formatting string without "%" conversion specifier. */
++-#define CURL_FORMAT_CURL_OFF_TU "llu"
++-
++-/* curl_off_t formatting string directive with "%" conversion specifier. */
++-#define CURL_FORMAT_OFF_T "%lld"
++-
++-/* The size of `curl_off_t', as computed by sizeof. */
++-#define CURL_SIZEOF_CURL_OFF_T 8
++-
++-/* curl_off_t constant suffix. */
++-#define CURL_SUFFIX_CURL_OFF_T LL
++-
++-/* unsigned curl_off_t constant suffix. */
++-#define CURL_SUFFIX_CURL_OFF_TU ULL
++-
++ #endif /* __CURL_CURLBUILD_H */

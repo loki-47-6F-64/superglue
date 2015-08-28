@@ -1,0 +1,6 @@
+file_interface = interface +j +o {
+  resource_txt(file_name : string) : string;
+  resource_bin(file_name : string) : binary;
+
+  home_dir() : string;
+}

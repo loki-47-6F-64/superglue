@@ -1,0 +1,10 @@
+log_severity = enum {
+  debug;
+  info;
+  warn;
+  error;
+}
+
+log_interface = interface +j +o {
+  log(serverity : log_severity, message : string);
+}

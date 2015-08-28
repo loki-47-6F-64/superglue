@@ -1,0 +1,36 @@
+project(SuperGlueIOS)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
+
+##################################################################
+#Source files
+FILE (GLOB_RECURSE OBJC_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.mm")
+FILE (GLOB_RECURSE OBJC_SOURCES_DJINNI "${CMAKE_SOURCE_DIR}/djinni/support-lib/objc/*.mm")
+
+FILE (GLOB_RECURSE OBJC_PRIVATE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*+Private.h")
+FILE (GLOB_RECURSE OBJC_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+
+LIST (REMOVE_ITEM OBJC_HEADERS ${OBJC_PRIVATE_HEADERS})
+
+include_directories(
+  ${OBJC_HEADER_INCLUDE_DIRS}
+  ${KITTY_INCLUDE_DIRS}
+  "${CMAKE_SOURCE_DIR}/djinni/support-lib/objc"
+  "${CMAKE_SOURCE_DIR}/src/generated-src"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  "${CMAKE_CURRENT_SOURCE_DIR}/generated-src"
+)
+
+add_library(superglue STATIC ${OBJC_SOURCES} ${OBJC_HEADERS} ${OBJC_SOURCES_DJINNI})
+
+TARGET_LINK_LIBRARIES(superglue
+  superglueC
+)
+
+set_target_properties(superglue PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES")
+
+install(FILES ${OBJC_HEADERS} DESTINATION superglue/include)

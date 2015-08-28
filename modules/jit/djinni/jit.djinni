@@ -1,0 +1,3 @@
+jit_interface = interface +c {
+  static run();
+}

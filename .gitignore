@@ -1,0 +1,14 @@
+generated-src/
+
+build
+.DS_Store
+
+*.swp
+*.kdev4
+
+output
+libs
+
+config.json
+
+.idea

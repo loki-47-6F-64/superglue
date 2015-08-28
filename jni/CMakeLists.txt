@@ -1,0 +1,48 @@
+project(SuperGlueJNI)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O2 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
+
+set (LIBS_ROOT "./app/src/main/jniLibs")
+
+FILE (GLOB_RECURSE C_SOURCES "./*.c")
+FILE (GLOB_RECURSE CPP_SOURCES "./*.cpp")
+list(APPEND CPP_SOURCES_DJINNI "${CMAKE_SOURCE_DIR}/djinni/support-lib/jni/djinni_support.cpp")
+
+add_library (superglue SHARED ${C_SOURCES} ${CPP_SOURCES} ${CPP_SOURCES_DJINNI})
+
+include_directories(
+  ${KITTY_INCLUDE_DIRS}
+  "${CMAKE_SOURCE_DIR}/djinni/support-lib/jni"
+  "${CMAKE_SOURCE_DIR}/src/generated-src"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  "${CMAKE_CURRENT_SOURCE_DIR}/generated-src"
+)
+
+# Check for missing symbols during linking
+SET_TARGET_PROPERTIES(superglue PROPERTIES LINK_FLAGS "-Wl,--no-undefined")
+###################################################################
+#Dependencies
+TARGET_LINK_LIBRARIES(superglue
+  superglueC
+)
+
+install(
+  TARGETS superglue DESTINATION "${LIBS_ROOT}/${TARGET_ABI}"
+  PERMISSIONS
+    OWNER_READ OWNER_WRITE OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE
+)
+
+foreach(JAVA_SOURCE_DIR ${MODULE_DIRS})
+  get_filename_component(DIR_NAME ${JAVA_SOURCE_DIR} NAME)
+  install(DIRECTORY ${JAVA_SOURCE_DIR} DESTINATION "."
+    PATTERN ".djinni" EXCLUDE
+    PATTERN "${DIR_NAME}/build"  EXCLUDE
+    PATTERN "${DIR_NAME}/native" EXCLUDE
+    PATTERN "${DIR_NAME}/xcodeproj" EXCLUDE
+  )
+endforeach()

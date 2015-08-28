@@ -1,0 +1,23 @@
+{
+  "android" : {
+    "aProjectRoot" : "../superglueAndroid",
+    "aProjectName" : "superglue.com.loki.superglue",
+    "targets" : [
+      {
+        "arch" : "x86",
+        "abi"  : "x86",
+        "toolchain" : "x86-4.9",
+        "gdb" : "i686-linux-android-gdb"
+      },
+      {
+        "arch" : "arm",
+        "abi" : "armeabi-v7a",
+        "toolchain" : "arm-linux-androideabi-4.9",
+        "gdb" : "arm-linux-androideabi-gdb"
+      }
+    ]
+  },
+  "ios" : {
+    "iProjectRoot" : "../superglueIOS"
+  }
+}

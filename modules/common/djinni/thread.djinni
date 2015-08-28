@@ -1,0 +1,7 @@
+thread_callback = interface +c {
+  run();
+}
+
+thread_interface = interface +j +o {
+  create(call_back : thread_callback);
+}
