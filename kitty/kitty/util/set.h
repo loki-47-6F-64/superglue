@@ -29,12 +29,12 @@ namespace util {
   }
 
   template<class T>
-  auto concat(std::initializer_list<T> initializer_list) {
+  auto concat(const std::initializer_list<T> &initializer_list) {
     return concat(std::begin(initializer_list), std::end(initializer_list));
   }
   
   template<class It, class Function>
-  inline auto map_if(It begin, It end, Function f) -> 
+  inline auto map_if(It begin, It end, Function &&f) ->
   std::vector<
   typename std::remove_const<
   typename std::remove_reference<decltype(*f(*begin))>::type
@@ -61,13 +61,13 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto map_if(From &&from, Function f) -> decltype(map_if(std::begin(from), std::end(from), f))
+  inline auto map_if(From &&from, Function &&f) -> decltype(map_if(std::begin(from), std::end(from), f))
   {
-    return map_if(std::begin(from), std::end(from), f);
+    return map_if(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   
   template<class It, class Function>
-  inline auto map(It begin, It end, Function f) ->
+  inline auto map(It begin, It end, Function &&f) ->
   std::vector<
   typename std::remove_const<
   typename std::remove_reference<decltype(f(*begin))>::type
@@ -85,12 +85,12 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto map(From &&from, Function f) -> decltype(map(std::begin(from), std::end(from), f)) {
-    return map(std::begin(from), std::end(from), f);
+  inline auto map(From &&from, Function &&f) -> decltype(map(std::begin(from), std::end(from), f)) {
+    return map(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   
   template<class It, class Function>
-  inline auto fold(It begin, It end, Function f) -> decltype(f(*begin, *begin)) {
+  inline auto fold(It begin, It end, Function &&f) -> decltype(f(*begin, *begin)) {
     if(begin + 1 == end) {
       return *begin;
     }
@@ -101,30 +101,30 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto fold(From &&from, Function f) -> decltype(fold(std::begin(from), std::end(from), f)) {
-    return fold(std::begin(from), std::end(from), f);
+  inline auto fold(From &&from, Function &&f) -> decltype(fold(std::begin(from), std::end(from), f)) {
+    return fold(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   
   template<class Container, class Function>
   typename std::remove_reference<Container>::type
-  copy_if(Container &&from, Function f) {
+  copy_if(Container &&from, Function &&f) {
     typename std::remove_reference<Container>::type result;
     
-    std::copy_if(std::begin(from), std::end(from), std::back_inserter(result), f);
+    std::copy_if(std::begin(from), std::end(from), std::back_inserter(result), std::forward<Function>(f));
     
     return result;
   }
   
   template<class Container, class Function>
   typename std::remove_reference<Container>::type
-  move_if(Container &&from, Function f) {
+  move_if(Container &&from, Function &&f) {
     typename std::remove_reference<Container>::type result;
     
     std::copy_if(
       std::make_move_iterator(std::begin(from)),
       std::make_move_iterator(std::end(from)),
       std::back_inserter(result),
-      f
+      std::forward<Function>(f)
     );
     
     return result;
@@ -170,10 +170,9 @@ namespace util {
     
     return vecContainer;
   }
-  
-  
+
   template<class Container, class Function>
-  bool any(Container &&container, Function f) {
+  bool any(Container &&container, Function &&f) {
     for(auto &input : container) {
       if(f(input))
         return true;
@@ -181,7 +180,37 @@ namespace util {
     
     return false;
   }
-  
+
+  template<class Container, class Function>
+  bool all(Container &&container, Function &&f) {
+    for(auto &input : container) {
+      if(!f(input))
+        return false;
+    }
+
+    return true;
+  }
+
+  template<class T, class Function>
+  bool any(const std::initializer_list<T> &container, Function &&f) {
+    for(auto &input : container) {
+      if(f(input))
+        return true;
+    }
+
+    return false;
+  }
+
+  template<class T, class Function>
+  bool all(const std::initializer_list<T> &container, Function &&f) {
+    for(auto &input : container) {
+      if(!f(input))
+        return false;
+    }
+
+    return true;
+  }
+
   template<class T, class... Args>
   struct First {
     typedef T type;
