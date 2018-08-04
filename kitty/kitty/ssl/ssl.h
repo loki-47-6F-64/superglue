@@ -32,7 +32,5 @@ void init();
 class sockaddr;
 file::ssl accept(Context &ctx, int fd);
 file::ssl connect(Context &ctx, const char *hostname, const char* port);
-
-std::string getCN(const SSL *ssl);
 }
 #endif
