@@ -65,7 +65,7 @@ fi
     --java-package "$java_package" \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
-    --ident-java-field "JF" \
+    --ident-java-field "mFooBar" \
     \
     --cpp-out "$temp_out/cpp" \
     --cpp-namespace "gen" \
@@ -74,8 +74,8 @@ fi
     --cpp-optional-header "<kitty/util/optional.h>" \
     \
     --jni-out "$temp_out/jni" \
-    --ident-jni-class "Native" \
-    --ident-jni-file "Native" \
+    --ident-jni-class "NativeFooBar" \
+    --ident-jni-file "NativeFooBar" \
     \
     --objcpp-namespace "djinni_generated" \
     --objc-out "$temp_out/objc" \
