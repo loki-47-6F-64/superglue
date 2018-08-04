@@ -8,6 +8,7 @@
 #include <kitty/util/string.h>
 #include <config.hpp>
 
+#include <log_severity.hpp>
 #include "jit.hpp"
 
 namespace jit {
@@ -648,38 +649,38 @@ void gen::JitInterface::run() {
 
   uint32_t_call_type func = return_const.get<uint32_t_call_type>();
   uint32_t const_ret = func();
-  logManager->log(log_severity::DEBUG, "const_ret = [" + std::to_string(const_ret) + "]");
+  logManager->log(LogSeverity::DEBUG, "const_ret = [" + std::to_string(const_ret) + "]");
 
   uint32_t add_two_params_res = (add_two_params.get<uint32_t_call_add_two_params>())(19, 23);
-  logManager->log(log_severity::DEBUG, "add_two_params = [" + std::to_string(add_two_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "add_two_params = [" + std::to_string(add_two_params_res) + "]");
 
   uint32_t max_two_params_res1 = (max_two_params.get<uint32_t_call_add_two_params>())(42, 13);
 
   uint32_t max_two_params_res2 = (max_two_params.get<uint32_t_call_add_two_params>())(13, 42);
-  logManager->log(log_severity::DEBUG, "max_two_params = [" + std::to_string(max_two_params_res1) + "]");
-  logManager->log(log_severity::DEBUG, "max_two_params = [" + std::to_string(max_two_params_res2) + "]");
+  logManager->log(LogSeverity::DEBUG, "max_two_params = [" + std::to_string(max_two_params_res1) + "]");
+  logManager->log(LogSeverity::DEBUG, "max_two_params = [" + std::to_string(max_two_params_res2) + "]");
 
   uint32_t call_constant_res = (call_constant.get<uint32_t_call_type>())();
-  logManager->log(log_severity::DEBUG, "call_constant = [" + std::to_string(call_constant_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "call_constant = [" + std::to_string(call_constant_res) + "]");
 
   uint32_t call_max_two_params_res = (call_max_two_params.get<uint32_t_call_type>())();
-  logManager->log(log_severity::DEBUG, "call_max_two_params = [" + std::to_string(call_max_two_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "call_max_two_params = [" + std::to_string(call_max_two_params_res) + "]");
 
   uint32_t branch_res = branch.get<uint32_t_call_type>()();
-  logManager->log(log_severity::DEBUG, "branch = [" + std::to_string(branch_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "branch = [" + std::to_string(branch_res) + "]");
 
   uint32_t mul_two_params_res = (mul_two_params.get<uint32_t_call_add_two_params>())(7, 6);
-  logManager->log(log_severity::DEBUG, "mul_two_params = [" + std::to_string(mul_two_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "mul_two_params = [" + std::to_string(mul_two_params_res) + "]");
 
   uint32_t mul_three_params_res = (mul_three_params.get<uint32_t_call_add_three_params>())(4, 5, 22);
-  logManager->log(log_severity::DEBUG, "mul_three_params = [" + std::to_string(mul_three_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "mul_three_params = [" + std::to_string(mul_three_params_res) + "]");
 
   uint64_t umull_two_params_res = (umull_two_params.get<uint64_t_call_add_two_params>())(7, 6);
-  logManager->log(log_severity::DEBUG, "umull_two_params = [" + std::to_string(umull_two_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "umull_two_params = [" + std::to_string(umull_two_params_res) + "]");
 
   uint64_t umlal_three_params_res = (umlal_three_params.get<uint64_t_call_add_three_params>())(22, 4, 5);
-  logManager->log(log_severity::DEBUG, "mul_three_params = [" + std::to_string(umlal_three_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "mul_three_params = [" + std::to_string(umlal_three_params_res) + "]");
 
   uint32_t div_two_params_res = (div_two_params.get<uint32_t_call_add_two_params>())(84, 2);
-  logManager->log(log_severity::DEBUG, "div_two_params = [" + std::to_string(div_two_params_res) + "]");
+  logManager->log(LogSeverity::DEBUG, "div_two_params = [" + std::to_string(div_two_params_res) + "]");
 }

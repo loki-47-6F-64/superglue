@@ -29,9 +29,9 @@ temp_out="$base_dir/djinni-output-temp"
 
 in="$base_dir/output/all.djinni"
 
-cpp_out="$base_dir/generated-src/cpp"
-jni_out="$base_dir/generated-src/jni"
-objc_out="$base_dir/generated-src/objc"
+cpp_out="$base_dir/src/generated-src"
+jni_out="$base_dir/jni/generated-src"
+objc_out="$base_dir/objc/generated-src"
 java_out="$base_dir/modules/superglue/src/main/java/com/loki/superglue/djinni/jni"
 
 java_package="com.loki.superglue.djinni.jni"
@@ -65,11 +65,11 @@ fi
     --java-package "$java_package" \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
-    --ident-java-field "gen" \
+    --ident-java-field "JF" \
     \
     --cpp-out "$temp_out/cpp" \
     --cpp-namespace "gen" \
-    --ident-cpp-enum-type "gen" \
+    --ident-cpp-enum-type "enum" \
     --cpp-optional-template "util::Optional" \
     --cpp-optional-header "<kitty/util/optional.h>" \
     \
@@ -90,7 +90,9 @@ mirror() {
     local src="$1" ; shift
     local dest="$1" ; shift
     mkdir -p "$dest"
-    rsync -a --delete --checksum --itemize-changes "$src"/ "$dest" | grep -v '^\.' | sed "s/^/[$prefix]/"
+
+    rsync -r --delete --checksum --itemize-changes "$src"/ "$dest" | sed "s/^/[$prefix]/"
+    #rsync -a --delete --checksum --itemize-changes "$src"/ "$dest" | grep -v '^\.' | sed "s/^/[$prefix]/"
 }
 
 echo "Copying generated code to final directories..."
@@ -101,4 +103,5 @@ mirror "objc" "$temp_out/objc" "$objc_out"
 
 date > "$gen_stamp"
 
+rm -r "$temp_out"
 echo "djinni completed."

@@ -2,6 +2,8 @@
 #include "thread_t.hpp"
 #include <log_interface.hpp>
 
+#include <log_severity.hpp>
+
 std::shared_ptr<gen::LogInterface> logManager;
 std::shared_ptr<gen::ThreadInterface> threadManager;
 std::shared_ptr<gen::FileInterface> fileManager;
@@ -17,6 +19,6 @@ void CommonInterface::config(
   threadManager = thread_obj;
   fileManager = file_manager;
   
-  logManager->log(log_severity::DEBUG, "Registered logging object");
+  logManager->log(LogSeverity::DEBUG, "Registered logging object");
 }
 }
