@@ -11,6 +11,7 @@ add_library(download-ssl STATIC IMPORTED)
 set(OPENSSL_LIBRARIES download-ssl download-crypto)
 
 
+message("ANDROID_DEV=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr")
 if(${TARGET_PLATFORM} STREQUAL ANDROID)
   if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     if(${TARGET_ABI} STREQUAL "armeabi-v7a")
@@ -22,21 +23,28 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
     endif()
     
     # Default RANLIB of OSX is not compatible with Android
-    file(GLOB CC "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/*-gcc")
-    file(GLOB RANLIB "${CC}-ranlib")
-    file(GLOB AR "${CC}-ar")
-    file(GLOB NM "${CC}-nm")
-    file(GLOB CC "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/*-gcc")
+    file(GLOB RANLIB "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/*-android-ranlib")
+    file(GLOB AR "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/llvm-ar")
+    file(GLOB NM "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/llvm-nm")
+    file(GLOB CC "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/*-clang")
     
     ExternalProject_Add(OpenSSL
       GIT_REPOSITORY "https://github.com/openssl/openssl.git"
-      GIT_TAG "OpenSSL_1_0_1-stable"
+      GIT_TAG "OpenSSL_1_1_0-stable"
     
-      UPDATE_COMMAND "git" "pull"
-      CONFIGURE_COMMAND "CC=${CC}" "RANLIB=${RANLIB}" "AR=${AR}" "NM=${NM}" "./Configure" "${CONFIGURE_ABI}"
+      #UPDATE_COMMAND "git" "pull"
+      UPDATE_COMMAND ""
+      PATCH_COMMAND
+        sed -e "s/\\-mandroid//g" -i Configurations/10-main.conf
+      CONFIGURE_COMMAND
+        "CC=${CC}" "RANLIB=${RANLIB}" "AR=${AR}" "NM=${NM}" "./Configure" "${CONFIGURE_ABI}"
+
       BUILD_IN_SOURCE 1
-      BUILD_COMMAND "ANDROID_DEV=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr" "make" "build_libs"
+      BUILD_COMMAND
+        "CROSS_SYSROOT=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr" "make" "build_libs"
       INSTALL_COMMAND ""
+
+      LOG_DOWNLOAD 1
     )
 
     ExternalProject_Get_Property(OpenSSL binary_dir)

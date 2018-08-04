@@ -27,7 +27,7 @@ base_dir=$(cd "`dirname "$loc"`" && pwd)
 
 temp_out="$base_dir/djinni-output-temp"
 
-in="$base_dir/example.djinni"
+in="$base_dir/output/all.djinni"
 
 cpp_out="$base_dir/generated-src/cpp"
 jni_out="$base_dir/generated-src/jni"
@@ -62,24 +62,24 @@ fi
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
 "$base_dir/djinni/src/run-assume-built" \
     --java-out "$temp_out/java" \
-    --java-package $java_package \
+    --java-package "$java_package" \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
-    --ident-java-field mFooBar \
+    --ident-java-field "gen" \
     \
     --cpp-out "$temp_out/cpp" \
     --cpp-namespace "gen" \
-    --ident-cpp-enum-type foo_bar \
-    --cpp-optional-template "util::Optional"
-    --cpp-optional-header "<kitty/util/optional.h>"
+    --ident-cpp-enum-type "gen" \
+    --cpp-optional-template "util::Optional" \
+    --cpp-optional-header "<kitty/util/optional.h>" \
     \
     --jni-out "$temp_out/jni" \
-    --ident-jni-class Native \
-    --ident-jni-file Native \
+    --ident-jni-class "Native" \
+    --ident-jni-file "Native" \
     \
-      --objcpp-namespace djinni_generated \
-      --objc-out "$temp_out/objc" \
-      --objcpp-out "$temp_out/objc" \
+    --objcpp-namespace "djinni_generated" \
+    --objc-out "$temp_out/objc" \
+    --objcpp-out "$temp_out/objc" \
     --objc-type-prefix "u" \
     \
     --idl "$in"
