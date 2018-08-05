@@ -32,7 +32,6 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
       GIT_REPOSITORY "https://github.com/openssl/openssl.git"
       GIT_TAG "OpenSSL_1_1_0-stable"
     
-      #UPDATE_COMMAND "git" "pull"
       UPDATE_COMMAND ""
       PATCH_COMMAND
         sed -e "s/\\-mandroid//g" -i Configurations/10-main.conf
@@ -41,10 +40,8 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
 
       BUILD_IN_SOURCE 1
       BUILD_COMMAND
-        "CROSS_SYSROOT=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr" "make" "build_libs"
+        "CROSS_SYSROOT=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr" "make" "-j4" "build_libs"
       INSTALL_COMMAND ""
-
-      LOG_DOWNLOAD 1
     )
 
     ExternalProject_Get_Property(OpenSSL binary_dir)
