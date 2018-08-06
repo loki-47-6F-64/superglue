@@ -1,19 +1,25 @@
 {
   "android" : {
-    "aProjectRoot" : "../superglueAndroid",
-    "aProjectName" : "superglue.com.loki.superglue",
+    "aProjectRoot" : "../AndroidGlue",
+    "aProjectName" : "loki.com.androidglue",
+    "ndk" : {
+      "version" : "r17b",
+      "api" : "21",
+      "linuxChecksum" : "dd5762ee7ef4995ad04fe0c45a608c344d99ca9f",
+      "macChecksum" : "f990aafaffec0b583d2c5420bfa622e52ac14248"
+    },
     "targets" : [
       {
         "arch" : "x86",
         "abi"  : "x86",
         "toolchain" : "x86-4.9",
-        "gdb" : "i686-linux-android-gdb"
+        "gdb" : "gdb"
       },
       {
         "arch" : "arm",
         "abi" : "armeabi-v7a",
         "toolchain" : "arm-linux-androideabi-4.9",
-        "gdb" : "arm-linux-androideabi-gdb"
+        "gdb" : "gdb"
       }
     ]
   },
