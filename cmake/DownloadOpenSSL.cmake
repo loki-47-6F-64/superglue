@@ -23,8 +23,8 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
     endif()
     
     ExternalProject_Add(OpenSSL
-      GIT_REPOSITORY "https://github.com/openssl/openssl.git"
-      GIT_TAG "OpenSSL_1_1_0-stable"
+      URL https://www.openssl.org/source/openssl-1.1.0h.tar.gz
+      URL_HASH SHA1=0fc39f6aa91b6e7f4d05018f7c5e991e1d2491fd
     
       UPDATE_COMMAND ""
       PATCH_COMMAND
