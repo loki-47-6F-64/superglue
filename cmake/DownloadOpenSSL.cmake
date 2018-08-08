@@ -55,12 +55,13 @@ elseif(${TARGET_PLATFORM} STREQUAL IOS)
       GIT_REPOSITORY "https://github.com/x2on/OpenSSL-for-iPhone.git"
       GIT_TAG "master"
 
-      UPDATE_COMMAND "git" "pull"
+      UPDATE_COMMAND ""
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ""
 
       # Xcode environment causes undefined symboles in build script
-      BUILD_COMMAND "env" "-i" "sh" "-c" "./build-libssl.sh"
+      #BUILD_COMMAND "env" "-i" "sh" "-c" "./build-libssl.sh" "--version=1.1.0h" "--targets=ios-sim-cross-x86_64 ios64-cross-arm64 ios-cross-armv7"
+      BUILD_COMMAND "./build-libssl.sh" "--version=1.1.0h" "--targets=ios-sim-cross-x86_64 ios64-cross-arm64 ios-cross-armv7"
 
       INSTALL_COMMAND ""
     )

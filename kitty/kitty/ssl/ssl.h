@@ -27,7 +27,6 @@ Context init_ctx_client(const char *caPath);
 Context init_ctx_client(std::string& caPath);
 Context init_ctx_client(std::string&& caPath);
 
-void init();
 // On failure Client.get() returns nullptr
 class sockaddr;
 file::ssl accept(Context &ctx, int fd);

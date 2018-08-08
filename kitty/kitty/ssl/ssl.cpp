@@ -15,15 +15,6 @@ extern void set(const char *err);
 namespace ssl {
 std::unique_ptr<std::mutex[]> lock;
 
-void crypto_lock(int mode, int n, const char *file, int line) {
-  if(mode & CRYPTO_LOCK) {
-    lock[n].lock();
-  }
-  else {
-    lock[n].unlock();
-  }
-}
-
 static int loadCertificates(Context& ctx, const char *caPath, const char *certPath, const char *keyPath, bool verify) {
   
   if(certPath && keyPath) {
@@ -114,15 +105,6 @@ Context init_ctx_client(std::string& caPath) {
 
 Context init_ctx_client(std::string&& caPath) {
   return init_ctx_client(caPath);
-}
-
-void init() {
-  SSL_library_init();
-  OpenSSL_add_all_algorithms();
-  SSL_load_error_strings();
-
-  lock = std::unique_ptr < std::mutex[]>(new std::mutex[CRYPTO_num_locks()]);
-  CRYPTO_set_locking_callback(crypto_lock);
 }
 
 file::ssl connect(Context &ctx, const char *hostname, const char* port) {

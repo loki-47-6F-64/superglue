@@ -350,9 +350,6 @@ typedef FD<stream::ssl> ssl;
 
 ###### ssl
 ```c++
-// Needs to be called ones before using any ssl functions
-void init();
-
 // Create a Context
 // On failure Context.get() returns nullptr
 Context init_ctx_server(std::string &caPath, std::string& certPath, std::string& keyPath);
