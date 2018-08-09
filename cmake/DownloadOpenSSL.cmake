@@ -61,7 +61,7 @@ elseif(${TARGET_PLATFORM} STREQUAL IOS)
 
       # Xcode environment causes undefined symboles in build script
       #BUILD_COMMAND "env" "-i" "sh" "-c" "./build-libssl.sh" "--version=1.1.0h" "--targets=ios-sim-cross-x86_64 ios64-cross-arm64 ios-cross-armv7"
-      BUILD_COMMAND "./build-libssl.sh" "--version=1.1.0h" "--targets=ios-sim-cross-x86_64 ios64-cross-arm64 ios-cross-armv7"
+      BUILD_COMMAND "./build-libssl.sh" "--version=1.1.0h" "--targets=ios-sim-cross-x86_64 ios64-cross-arm64 ios-cross-armv7s ios-cross-armv7"
 
       INSTALL_COMMAND ""
     )
