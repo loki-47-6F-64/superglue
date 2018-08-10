@@ -8,7 +8,7 @@
 #include <utility>
 #include <type_traits>
 #include <array>
-#include <kitty/util/optional.h>
+#include "optional.h"
 
 namespace util {
   template<class It>
@@ -161,13 +161,18 @@ namespace util {
     std::vector<typename std::remove_reference<Container>::type> vecContainer;
     
     auto begin = std::begin(container);
-    for(auto end = begin; end < std::end(container); ++end) {
+    auto end = begin;
+    for(; end < std::end(container); ++end) {
       if(val == *end && begin < end) {
         vecContainer.emplace_back(begin, end);
-        begin = end;
+        begin = end +1;
       }
     }
     
+    if(begin < end) {
+      vecContainer.emplace_back(begin, end);
+    }
+
     return vecContainer;
   }
 

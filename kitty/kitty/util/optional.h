@@ -100,9 +100,13 @@ public:
   bool isEnabled() const {
     return _obj.constructed();
   }
-  
+
   explicit operator bool () const {
-    return _obj.constructed();
+    return isEnabled();
+  }
+
+  explicit operator bool () {
+        return isEnabled();
   }
   
   operator elem_t&() {
