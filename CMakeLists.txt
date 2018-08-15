@@ -43,7 +43,6 @@ if(NOT BUILD_EXTERNAL_MULTI_ARCH)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a")
     endif()
   
-    set(KITTY_BUILD_SSL ON)
     add_subdirectory(kitty)
     find_package(Kitty
       REQUIRED

@@ -1,0 +1,17 @@
+blue_state = enum {
+  off;
+  turning_off;
+  on;
+  turning_on;
+}
+
+blue_callback = interface +c {
+  on_state_change(new_state : blue_state);
+}
+
+blue_cast_interface = interface +c {
+  static config(
+  );
+
+  static get_callback() : blue_callback;
+}
