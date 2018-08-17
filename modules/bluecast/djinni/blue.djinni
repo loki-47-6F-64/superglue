@@ -1,16 +1,41 @@
-blue_state = enum {
+blue_power_state = enum {
   off;
   turning_off;
   on;
   turning_on;
 }
 
+blue_device = record {
+  name : string;
+  address : string;
+}
+
+blue_scan_result = record {
+  dev : blue_device;
+  advertising_sid : optional<i32>;
+  tx_power : optional<i32>;
+  rssi : i32;
+
+  data_complete : bool;
+  connectable : bool;
+}
+
 blue_callback = interface +c {
-  on_state_change(new_state : blue_state);
+  on_state_change(new_state : blue_power_state);
+  on_scan_result(scan : blue_scan_result);
+}
+
+blue_controller = interface +j +o {
+  is_enabled() : bool;
+  enable();
+
+  scan(enable : bool);
 }
 
 blue_cast_interface = interface +c {
   static config(
+    blue_manager : blue_controller,
+    permission_manager : permission_interface
   );
 
   static get_callback() : blue_callback;

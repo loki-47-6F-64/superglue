@@ -7,13 +7,16 @@
 
 #include <blue_cast_interface.hpp>
 #include <blue_callback.hpp>
-#include <blue_state.hpp>
+#include <blue_power_state.hpp>
 
+namespace bluecast {
 class BlueCallback : public gen::BlueCallback {
 public:
-  void on_state_change(gen::BlueState blueState) override;
+  void on_state_change(gen::BluePowerState blueState) override;
+
+  void on_scan_result(const gen::BlueScanResult &scan) override;
 
   ~BlueCallback() override;
 };
-
+}
 #endif //SUPERGLUE_BLUECAST_H

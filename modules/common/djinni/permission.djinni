@@ -1,0 +1,14 @@
+permission = enum {
+  bluetooth;
+  bluetooth_admin;
+  coarse_location;
+}
+
+permission_callback = interface +c {
+  result(perm : permission, granted : bool);
+}
+
+permission_interface = interface +j +o {
+  has(perm : permission) : bool;
+  request(perm : permission, f : permission_callback);
+}

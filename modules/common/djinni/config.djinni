@@ -1,7 +1,7 @@
 common_interface = interface +c {
-  static config(
-    log_obj        : log_interface,
-    thread_manager : thread_interface,
-    file_manager   : file_interface
+  static init(
+    log_manager        : log_interface,
+    thread_manager     : thread_interface,
+    file_manager       : file_interface
   );
 }
