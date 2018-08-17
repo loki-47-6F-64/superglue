@@ -69,7 +69,7 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   }
 
   ss << "rssi::" << scan.rssi << std::endl;
-  ss << "dev::name::" << scan.dev.name << std::endl;
+  ss << "dev::name::" << (scan.dev.name ? *scan.dev.name : "unknown") << std::endl;
   ss << "dev::address::" << scan.dev.address << std::endl;
 
   logManager->log(gen::LogSeverity::DEBUG, ss.str());
@@ -109,6 +109,13 @@ void gen::BlueCastInterface::config(
       std::make_shared<PermFunc>([permission_manager](Permission p, bool granted) {
         if (permission_manager->has(gen::Permission::COARSE_LOCATION)) {
           logManager->log(LogSeverity::DEBUG, "coarse_location::true");
+
+          logManager->log(LogSeverity::INFO, "start scanning.");
+          bluecast::blueManager->scan(true);
+          bluecast::tasks().pushTimed([]() {
+            logManager->log(LogSeverity::INFO, "stop scanning.");
+            bluecast::blueManager->scan(false);
+            }, 100000);
         } else {
           logManager->log(LogSeverity::DEBUG, "coarse_location::false");
         }

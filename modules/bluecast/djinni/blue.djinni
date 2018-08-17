@@ -6,7 +6,7 @@ blue_power_state = enum {
 }
 
 blue_device = record {
-  name : string;
+  name : optional<string>;
   address : string;
 }
 
