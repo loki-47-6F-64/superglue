@@ -104,9 +104,9 @@ void gen::BlueCastInterface::config(
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }, []() {});
 
-  bluecast::tasks().push([=]() {
+  bluecast::tasks().push([permission_manager]() {
     permission_manager->request(gen::Permission::COARSE_LOCATION,
-      std::make_shared<PermFunc>([=, &permission_manager](Permission p, bool granted) {
+      std::make_shared<PermFunc>([permission_manager](Permission p, bool granted) {
         if (permission_manager->has(gen::Permission::COARSE_LOCATION)) {
           logManager->log(LogSeverity::DEBUG, "coarse_location::true");
         } else {
