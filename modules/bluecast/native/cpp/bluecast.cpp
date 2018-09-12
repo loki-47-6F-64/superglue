@@ -8,16 +8,23 @@
 #include <blue_scan_result.hpp>
 #include <blue_controller.hpp>
 
+#include <blue_gatt.hpp>
+#include <blue_gatt_service.hpp>
+#include <blue_gatt_characteristic.hpp>
+#include <blue_gatt_descriptor.hpp>
+
 #include <permission.hpp>
 
 #include <kitty/util/auto_run.h>
 #include <kitty/util/thread_pool.h>
+#include <generated-src/blue_gatt_connection_state.hpp>
 
 #include "config.hpp"
 #include "thread_t.hpp"
 #include "bluecast.h"
 #include "permission.h"
 
+#define TASK(x,y) tasks().push([x] () { y; })
 namespace bluecast {
 std::shared_ptr<gen::BlueController> blueManager;
 
@@ -72,8 +79,52 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   ss << "dev::name::" << (scan.dev.name ? *scan.dev.name : "unknown") << std::endl;
   ss << "dev::address::" << scan.dev.address << std::endl;
 
+  if(scan.dev.name && *scan.dev.name == "Viking") {
+    TASK(scan,
+      bluecast::blueManager->scan(false);
+      bluecast::blueManager->connect_gatt(scan.dev);
+    );
+  }
+
   logManager->log(gen::LogSeverity::DEBUG, ss.str());
 }
+
+void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) {
+  if(result) {
+    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::success");
+    TASK(=,
+      for(const auto &service : gatt->services()) {
+        logManager->log(gen::LogSeverity::INFO, "service::" + service->uuid());
+        for(const auto &characteristic : service->characteristics()) {
+          logManager->log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
+
+          for(const auto &descriptor : characteristic->descriptors()) {
+            logManager->log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
+          }
+        }
+      }
+
+      gatt->disconnect();
+    );
+  }
+  else {
+    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::fail");
+  }
+}
+
+void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) {
+  if(new_state == gen::BlueGattConnectionState::CONNECTED) {
+    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::CONNECTED");
+    TASK(=, gatt->discover_services());
+  }
+  else if(new_state == gen::BlueGattConnectionState::DISCONNECTED) {
+    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
+  }
+  else {
+    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
+  }
+}
+
 
 BlueCallback::~BlueCallback() = default;
 

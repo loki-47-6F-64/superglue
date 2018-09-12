@@ -5,6 +5,13 @@ blue_power_state = enum {
   turning_on;
 }
 
+blue_gatt_connection_state = enum {
+    connected;
+    connecting;
+    disconnected;
+    disconnecting;
+}
+
 blue_device = record {
   name : optional<string>;
   address : string;
@@ -20,9 +27,33 @@ blue_scan_result = record {
   connectable : bool;
 }
 
+blue_gatt_descriptor = interface {
+  uuid() : string;
+}
+
+blue_gatt_characteristic = interface {
+  uuid() : string;
+  descriptors() : list<blue_gatt_descriptor>;
+}
+
+blue_gatt_service = interface {
+  uuid() : string;
+  characteristics() : list<blue_gatt_characteristic>;
+}
+
+blue_gatt = interface {
+  disconnect();
+  discover_services() : bool;
+
+  services() : list<blue_gatt_service>;
+}
+
 blue_callback = interface +c {
   on_state_change(new_state : blue_power_state);
   on_scan_result(scan : blue_scan_result);
+
+  on_gatt_services_discovered(gatt : blue_gatt, result : bool);
+  on_gatt_connection_state_change(gatt : blue_gatt, new_state : blue_gatt_connection_state);
 }
 
 blue_controller = interface +j +o {
@@ -30,6 +61,8 @@ blue_controller = interface +j +o {
   enable();
 
   scan(enable : bool);
+
+  connect_gatt(dev : blue_device);
 }
 
 blue_cast_interface = interface +c {

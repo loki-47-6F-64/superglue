@@ -16,6 +16,10 @@ public:
 
   void on_scan_result(const gen::BlueScanResult &scan) override;
 
+  void on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) override;
+
+  void on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) override;
+
   ~BlueCallback() override;
 };
 }
