@@ -70,8 +70,7 @@ elseif(${TARGET_PLATFORM} STREQUAL ANDROID)
     elseif(${TARGET_ABI} STREQUAL "x86")
       set(RANLIB "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/i686-linux-android-ranlib")
     endif()
-   
-    message(testing)
+
     file(GLOB AR "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/llvm-ar")
     file(GLOB NM "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/llvm-nm")
     file(GLOB CC "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/bin/*-clang")

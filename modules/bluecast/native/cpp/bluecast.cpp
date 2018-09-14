@@ -3,10 +3,13 @@
 //
 #include <sstream>
 
+#include <map>
+
 #include <blue_cast_interface.hpp>
 #include <log_severity.hpp>
 #include <blue_scan_result.hpp>
 #include <blue_controller.hpp>
+#include <blue_view_controller.hpp>
 
 #include <blue_gatt.hpp>
 #include <blue_gatt_service.hpp>
@@ -25,40 +28,31 @@
 #include "permission.h"
 
 #define TASK(x,y) tasks().push([x] () { y; })
+#define DELAY(x,y,z) tasks().pushTimed([x] () { y; }, std::chrono::milliseconds(z))
 namespace bluecast {
 std::shared_ptr<gen::BlueController> blueManager;
+std::shared_ptr<gen::BlueViewController> blueView;
 
-util::TaskPool &tasks() {
+auto &blue_devices() {
+  static std::map<std::string, gen::BlueDevice> _blue_devices;
+
+  return _blue_devices;
+}
+
+auto &tasks() {
   static util::TaskPool taskPool;
 
   return taskPool;
 }
 
-util::AutoRun<thread_t> &thread() {
+auto &thread() {
   static util::AutoRun<thread_t> autoRun;
 
   return autoRun;
 }
 
-void BlueCallback::on_state_change(gen::BluePowerState blueState) {
-  switch (blueState) {
-    case gen::BluePowerState::OFF:
-      logManager->log(gen::LogSeverity::DEBUG, "Bluetooth state: OFF");
-
-      blueManager->enable();
-      break;
-    case gen::BluePowerState::TURNING_OFF:
-      logManager->log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING OFF");
-      break;
-    case gen::BluePowerState::ON:
-      logManager->log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
-
-      blueManager->scan(true);
-      break;
-    case gen::BluePowerState::TURNING_ON:
-      logManager->log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING ON");
-      break;
-  }
+void log(gen::LogSeverity severity, const std::string &message) {
+  TASK(=, logManager->log(severity, message));
 }
 
 void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
@@ -79,24 +73,29 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   ss << "dev::name::" << (scan.dev.name ? *scan.dev.name : "unknown") << std::endl;
   ss << "dev::address::" << scan.dev.address << std::endl;
 
-  if(scan.dev.name && *scan.dev.name == "Viking") {
-    TASK(scan,
-      bluecast::blueManager->scan(false);
-      bluecast::blueManager->connect_gatt(scan.dev);
-    );
-  }
+  TASK(scan,
+    if(blue_devices().count(scan.dev.address) == 0) {
+      if(scan.dev.name && *scan.dev.name == "Viking") {
+        bluecast::blueManager->scan(false);
+        bluecast::blueManager->connect_gatt(scan.dev);
+      }
 
-  logManager->log(gen::LogSeverity::DEBUG, ss.str());
+      blue_devices().emplace(scan.dev.address, scan.dev);
+    }
+  );
+
+
+  log(gen::LogSeverity::DEBUG, ss.str());
 }
 
 void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) {
   if(result) {
-    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::success");
+    log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::success");
     TASK(=,
       for(const auto &service : gatt->services()) {
-        logManager->log(gen::LogSeverity::INFO, "service::" + service->uuid());
+        log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
-          logManager->log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
+          log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
           if(characteristic->uuid() != "2096d612-39b6-41bf-b511-0f8ade8ef6c0") {
             continue;
           }
@@ -104,90 +103,134 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
           TASK(=, gatt->read_characteristic(characteristic));
 
           for(const auto &descriptor : characteristic->descriptors()) {
-            logManager->log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
+            log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
           }
         }
       }
     );
   }
   else {
-    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::fail");
+    log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::fail");
   }
 }
 
 void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) {
   if(new_state == gen::BlueGattConnectionState::CONNECTED) {
-    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::CONNECTED");
-    TASK(=, gatt->discover_services());
+    log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::CONNECTED");
+    DELAY(gatt, gatt->discover_services(), 1000);
   }
   else if(new_state == gen::BlueGattConnectionState::DISCONNECTED) {
-    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
+    log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
   }
   else {
-    logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
+    log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
   }
 }
 
 void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &gatt,
                                           const std::shared_ptr<gen::BlueGattCharacteristic> &characteristic,
                                           bool result) {
-  logManager->log(gen::LogSeverity::DEBUG, "on_characteristic_read::" + std::string(result ? "success" : "fail"));
+  log(gen::LogSeverity::DEBUG, "on_characteristic_read::" + std::string(result ? "success" : "fail"));
 
   TASK(=, gatt->disconnect());
   if(result) {
-    TASK(=,
-      logManager->log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0))
-    );
+    log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0));
   }
 }
 
 
 BlueCallback::~BlueCallback() = default;
 
+void BlueViewCallback::on_power_state_change(gen::BluePowerState blueState) {
+  switch (blueState) {
+    case gen::BluePowerState::OFF:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: OFF");
+
+      TASK(,blueView->blue_enable(true));
+      break;
+    case gen::BluePowerState::TURNING_OFF:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING OFF");
+      break;
+    case gen::BluePowerState::ON:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
+
+      TASK(,blueManager->scan(true));
+      break;
+    case gen::BluePowerState::TURNING_ON:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING ON");
+      break;
+  }
+}
 /* namespace bluecast */ }
 
-void gen::BlueCastInterface::config(
-  const std::shared_ptr<gen::BlueController> &blue_manager,
-  const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
-  bluecast::blueManager = blue_manager;
+void start_scan() {
+  bluecast::log(gen::LogSeverity::INFO, "start scanning.");
+  bluecast::blueManager->scan(true);
+  bluecast::tasks().pushTimed([]() {
+    bluecast::blueManager->scan(false);
+  }, std::chrono::seconds(10));
+}
 
+std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(const std::shared_ptr<gen::BlueViewController> &blue_view,
+                                       const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
+
+  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
+  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
+  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::COARSE_LOCATION) ? "coarse_location::true" : "coarse_location::false");
+
+  bluecast::blueView = blue_view;
   if (!bluecast::blueManager->is_enabled()) {
-    bluecast::blueManager->enable();
+    bluecast::blueView->blue_enable(true);
+
+    return std::make_shared<bluecast::BlueViewCallback>();
   }
 
-  logManager->log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
-  logManager->log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
-  logManager->log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::COARSE_LOCATION) ? "coarse_location::true" : "coarse_location::false");
+  if(!permission_manager->has(gen::Permission::COARSE_LOCATION)) {
+    bluecast::tasks().push([permission_manager]() {
+      permission_manager->request(
+        gen::Permission::COARSE_LOCATION,
+        std::make_shared<PermFunc>([permission_manager](Permission p, bool granted) {
+          if(permission_manager->has(gen::Permission::COARSE_LOCATION)) {
+            bluecast::log(LogSeverity::DEBUG, "coarse_location::true");
+
+            start_scan();
+          } else {
+            bluecast::log(LogSeverity::DEBUG, "coarse_location::false");
+          }
+        }));
+    });
+  } else {
+    start_scan();
+  }
+
+  return std::make_shared<bluecast::BlueViewCallback>();
+}
+
+void gen::BlueCastInterface::on_destroy() { }
+
+void gen::BlueCastInterface::config(
+  const std::shared_ptr<gen::BlueController> &blue_manager) {
+  bluecast::blueManager = blue_manager;
+
+
 
   bluecast::thread().run(
     [] () {
-      logManager->log(LogSeverity::DEBUG, "started main superglue loop");
+      bluecast::log(LogSeverity::DEBUG, "started main superglue loop");
     },
     []() {
       while (auto task = bluecast::tasks().pop()) {
+        auto _begin = std::chrono::steady_clock::now();
         (*task)->run();
+        auto milli = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _begin);
+
+        if(milli.count() > 100) {
+          logManager->log(gen::LogSeverity::WARN, "duration of task => [" + std::to_string(milli.count()) + "] milliseconds");
+        }
       }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }, []() {});
-
-  bluecast::tasks().push([permission_manager]() {
-    permission_manager->request(gen::Permission::COARSE_LOCATION,
-      std::make_shared<PermFunc>([permission_manager](Permission p, bool granted) {
-        if (permission_manager->has(gen::Permission::COARSE_LOCATION)) {
-          logManager->log(LogSeverity::DEBUG, "coarse_location::true");
-
-          logManager->log(LogSeverity::INFO, "start scanning.");
-          bluecast::blueManager->scan(true);
-          bluecast::tasks().pushTimed([]() {
-            logManager->log(LogSeverity::INFO, "stop scanning.");
-            bluecast::blueManager->scan(false);
-            }, 100000);
-        } else {
-          logManager->log(LogSeverity::DEBUG, "coarse_location::false");
-        }
-      }));
-  });
 }
 
 std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::get_callback() {

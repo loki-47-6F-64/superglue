@@ -41,12 +41,12 @@ public:
     return future;
   }
 
-  template<class Function, class... Args>
-  auto pushTimed(Function &&newTask, int64_t milli, Args &&... args) {
+  template<class Function, class X, class Y, class... Args>
+  auto pushTimed(Function &&newTask, std::chrono::duration<X, Y> duration, Args &&... args) {
     typedef decltype(newTask(std::forward<Args>(args)...)) __return;
     typedef std::packaged_task<__return()> task_t;
     
-    __time_point time_point = std::chrono::steady_clock::now() + std::chrono::milliseconds(milli);
+    __time_point time_point = std::chrono::steady_clock::now() + duration;
 
     task_t task(std::bind(
       std::forward<Function>(newTask),
@@ -59,7 +59,7 @@ public:
     
     auto it = _timer_tasks.cbegin();
     for(; it < _timer_tasks.cend(); ++it) {
-      if(std::get<0>(*it) >= time_point) {
+      if(std::get<0>(*it) < time_point) {
         break;
       }
     }

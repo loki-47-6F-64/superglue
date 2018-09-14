@@ -52,8 +52,11 @@ blue_gatt = interface {
   read_characteristic(characteristic : blue_gatt_characteristic);
 }
 
+blue_view_callback = interface +c {
+  on_power_state_change(new_state : blue_power_state);
+}
+
 blue_callback = interface +c {
-  on_state_change(new_state : blue_power_state);
   on_scan_result(scan : blue_scan_result);
 
   on_gatt_services_discovered(gatt : blue_gatt, result : bool);
@@ -62,9 +65,12 @@ blue_callback = interface +c {
   on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
 }
 
+blue_view_controller = interface +j +o {
+  blue_enable(enable : bool);
+}
+
 blue_controller = interface +j +o {
   is_enabled() : bool;
-  enable();
 
   scan(enable : bool);
 
@@ -73,9 +79,15 @@ blue_controller = interface +j +o {
 
 blue_cast_interface = interface +c {
   static config(
-    blue_manager : blue_controller,
-    permission_manager : permission_interface
+    blue_manager : blue_controller
   );
+
+  static on_create(
+    blue_view : blue_view_controller,
+    permission_manager : permission_interface
+  ) : blue_view_callback;
+
+  static on_destroy();
 
   static get_callback() : blue_callback;
 }

@@ -40,10 +40,10 @@ public:
     _cv.notify_one();
     return future;
   }
-  
-  template<class Function, class... Args>
-  auto pushTimed(Function && newTask, int64_t milli, Args &&... args) {
-    auto future = TaskPool::pushTimed(std::forward<Function>(newTask), milli, std::forward<Args>(args)...);
+
+  template<class Function, class X, class Y, class... Args>
+  auto pushTimed(Function &&newTask, std::chrono::duration<X, Y> duration, Args &&... args) {
+    auto future = TaskPool::pushTimed(std::forward<Function>(newTask), duration, std::forward<Args>(args)...);
 
     // Update all timers for wait_until
     _cv.notify_all();
