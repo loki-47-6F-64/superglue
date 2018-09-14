@@ -27,8 +27,8 @@
 #include "bluecast.h"
 #include "permission.h"
 
-#define TASK(x,y) tasks().push([x] () { y; })
-#define DELAY(x,y,z) tasks().pushTimed([x] () { y; }, std::chrono::milliseconds(z))
+#define TASK(x,y) ::bluecast::tasks().push([x] () { y; })
+#define DELAY(x,y,z) ::bluecast::tasks().pushTimed([x] () { y; }, std::chrono::milliseconds(z))
 namespace bluecast {
 std::shared_ptr<gen::BlueController> blueManager;
 std::shared_ptr<gen::BlueViewController> blueView;
@@ -75,8 +75,9 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
 
   TASK(scan,
     if(blue_devices().count(scan.dev.address) == 0) {
-      if(scan.dev.name && *scan.dev.name == "Viking") {
+      if(scan.dev.name && *scan.dev.name == "Galaxy S8") {
         bluecast::blueManager->scan(false);
+
         bluecast::blueManager->connect_gatt(scan.dev);
       }
 
@@ -96,7 +97,7 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
         log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
           log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
-          if(characteristic->uuid() != "2096d612-39b6-41bf-b511-0f8ade8ef6c0") {
+          if(characteristic->uuid() != "0000fff3-0000-1000-8000-00805f9b34fb") {
             continue;
           }
 
@@ -106,8 +107,7 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
             log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
           }
         }
-      }
-    );
+      });
   }
   else {
     log(gen::LogSeverity::DEBUG, "on_gatt_services_discovered::fail");
@@ -117,7 +117,7 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
 void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) {
   if(new_state == gen::BlueGattConnectionState::CONNECTED) {
     log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::CONNECTED");
-    DELAY(gatt, gatt->discover_services(), 1000);
+    TASK(gatt, gatt->discover_services());
   }
   else if(new_state == gen::BlueGattConnectionState::DISCONNECTED) {
     log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
@@ -171,8 +171,9 @@ void start_scan() {
   }, std::chrono::seconds(10));
 }
 
-std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(const std::shared_ptr<gen::BlueViewController> &blue_view,
-                                       const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
+std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(
+  const std::shared_ptr<gen::BlueViewController> &blue_view,
+  const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
 
   bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
   bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
@@ -189,8 +190,8 @@ std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(const s
     bluecast::tasks().push([permission_manager]() {
       permission_manager->request(
         gen::Permission::COARSE_LOCATION,
-        std::make_shared<PermFunc>([permission_manager](Permission p, bool granted) {
-          if(permission_manager->has(gen::Permission::COARSE_LOCATION)) {
+        std::make_shared<PermFunc>([](Permission p, bool granted) {
+          if(granted) {
             bluecast::log(LogSeverity::DEBUG, "coarse_location::true");
 
             start_scan();
@@ -200,7 +201,7 @@ std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(const s
         }));
     });
   } else {
-    start_scan();
+    TASK(,start_scan());
   }
 
   return std::make_shared<bluecast::BlueViewCallback>();
