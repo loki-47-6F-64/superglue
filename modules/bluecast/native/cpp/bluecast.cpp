@@ -97,14 +97,17 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
         logManager->log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
           logManager->log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
+          if(characteristic->uuid() != "2096d612-39b6-41bf-b511-0f8ade8ef6c0") {
+            continue;
+          }
+
+          TASK(=, gatt->read_characteristic(characteristic));
 
           for(const auto &descriptor : characteristic->descriptors()) {
             logManager->log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
           }
         }
       }
-
-      gatt->disconnect();
     );
   }
   else {
@@ -122,6 +125,19 @@ void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::Bl
   }
   else {
     logManager->log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
+  }
+}
+
+void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &gatt,
+                                          const std::shared_ptr<gen::BlueGattCharacteristic> &characteristic,
+                                          bool result) {
+  logManager->log(gen::LogSeverity::DEBUG, "on_characteristic_read::" + std::string(result ? "success" : "fail"));
+
+  TASK(=, gatt->disconnect());
+  if(result) {
+    TASK(=,
+      logManager->log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0))
+    );
   }
 }
 

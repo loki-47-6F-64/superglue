@@ -20,6 +20,9 @@ public:
 
   void on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) override;
 
+  void on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &gatt,
+                              const std::shared_ptr<gen::BlueGattCharacteristic> &characteristic, bool result) override;
+
   ~BlueCallback() override;
 };
 }

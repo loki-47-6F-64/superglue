@@ -34,6 +34,9 @@ blue_gatt_descriptor = interface {
 blue_gatt_characteristic = interface {
   uuid() : string;
   descriptors() : list<blue_gatt_descriptor>;
+
+  get_value() : binary;
+  get_string_value(offset : i32) : string;
 }
 
 blue_gatt_service = interface {
@@ -46,6 +49,7 @@ blue_gatt = interface {
   discover_services() : bool;
 
   services() : list<blue_gatt_service>;
+  read_characteristic(characteristic : blue_gatt_characteristic);
 }
 
 blue_callback = interface +c {
@@ -54,6 +58,8 @@ blue_callback = interface +c {
 
   on_gatt_services_discovered(gatt : blue_gatt, result : bool);
   on_gatt_connection_state_change(gatt : blue_gatt, new_state : blue_gatt_connection_state);
+
+  on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
 }
 
 blue_controller = interface +j +o {
