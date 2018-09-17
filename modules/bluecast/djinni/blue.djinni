@@ -45,6 +45,7 @@ blue_gatt_service = interface {
 }
 
 blue_gatt = interface {
+  close();
   disconnect();
   discover_services() : bool;
 

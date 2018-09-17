@@ -52,7 +52,7 @@ auto &thread() {
 }
 
 void log(gen::LogSeverity severity, const std::string &message) {
-  TASK(=, logManager->log(severity, message));
+  logManager->log(severity, message);
 }
 
 void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
@@ -75,7 +75,7 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
 
   TASK(scan,
     if(blue_devices().count(scan.dev.address) == 0) {
-      if(scan.dev.name && *scan.dev.name == "Galaxy S8") {
+      if(scan.dev.name && *scan.dev.name == "Viking") {
         bluecast::blueManager->scan(false);
 
         bluecast::blueManager->connect_gatt(scan.dev);
@@ -97,7 +97,7 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
         log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
           log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
-          if(characteristic->uuid() != "0000fff3-0000-1000-8000-00805f9b34fb") {
+          if(characteristic->uuid() != "00002a00-0000-1000-8000-00805f9b34fb") {
             continue;
           }
 
@@ -121,6 +121,7 @@ void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::Bl
   }
   else if(new_state == gen::BlueGattConnectionState::DISCONNECTED) {
     log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
+    TASK(gatt, gatt->close());
   }
   else {
     log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
