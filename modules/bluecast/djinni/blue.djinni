@@ -15,7 +15,7 @@ blue_gatt_connection_state = enum {
 blue_device = record {
   name : optional<string>;
   address : string;
-}
+} deriving(eq)
 
 blue_scan_result = record {
   dev : blue_device;
@@ -55,6 +55,9 @@ blue_gatt = interface {
 
 blue_view_callback = interface +c {
   on_power_state_change(new_state : blue_power_state);
+
+  on_toggle_scan(scan : bool);
+  on_select_device(dev : blue_device);
 }
 
 blue_callback = interface +c {
@@ -64,10 +67,20 @@ blue_callback = interface +c {
   on_gatt_connection_state_change(gatt : blue_gatt, new_state : blue_gatt_connection_state);
 
   on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
+
+  # Creating the functions that need an activity to run
+  on_create(
+    blue_view : blue_view_controller,
+    permission_manager : permission_interface
+  ) : blue_view_callback;
+
+  on_destroy();
 }
 
 blue_view_controller = interface +j +o {
   blue_enable(enable : bool);
+
+  device_list_update(device : blue_device);
 }
 
 blue_controller = interface +j +o {
@@ -81,14 +94,5 @@ blue_controller = interface +j +o {
 blue_cast_interface = interface +c {
   static config(
     blue_manager : blue_controller
-  );
-
-  static on_create(
-    blue_view : blue_view_controller,
-    permission_manager : permission_interface
-  ) : blue_view_callback;
-
-  static on_destroy();
-
-  static get_callback() : blue_callback;
+  ) : blue_callback;
 }

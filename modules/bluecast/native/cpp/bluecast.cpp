@@ -15,12 +15,12 @@
 #include <blue_gatt_service.hpp>
 #include <blue_gatt_characteristic.hpp>
 #include <blue_gatt_descriptor.hpp>
+#include <blue_gatt_connection_state.hpp>
 
 #include <permission.hpp>
 
 #include <kitty/util/auto_run.h>
 #include <kitty/util/thread_pool.h>
-#include <generated-src/blue_gatt_connection_state.hpp>
 
 #include "config.hpp"
 #include "thread_t.hpp"
@@ -29,15 +29,11 @@
 
 #define TASK(x,y) ::bluecast::tasks().push([x] () { y; })
 #define DELAY(x,y,z) ::bluecast::tasks().pushTimed([x] () { y; }, std::chrono::milliseconds(z))
+
+void request_permission(gen::Permission perm, const std::shared_ptr<gen::PermissionInterface> &permission_manager);
+
 namespace bluecast {
 std::shared_ptr<gen::BlueController> blueManager;
-std::shared_ptr<gen::BlueViewController> blueView;
-
-auto &blue_devices() {
-  static std::map<std::string, gen::BlueDevice> _blue_devices;
-
-  return _blue_devices;
-}
 
 auto &tasks() {
   static util::TaskPool taskPool;
@@ -55,7 +51,7 @@ void log(gen::LogSeverity severity, const std::string &message) {
   logManager->log(severity, message);
 }
 
-void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
+void log_scan_result(const gen::BlueScanResult &scan) {
   std::stringstream ss;
 
   ss << std::endl;
@@ -73,20 +69,22 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   ss << "dev::name::" << (scan.dev.name ? *scan.dev.name : "unknown") << std::endl;
   ss << "dev::address::" << scan.dev.address << std::endl;
 
-  TASK(scan,
-    if(blue_devices().count(scan.dev.address) == 0) {
-      if(scan.dev.name && *scan.dev.name == "Viking") {
-        bluecast::blueManager->scan(false);
-
-        bluecast::blueManager->connect_gatt(scan.dev);
-      }
-
-      blue_devices().emplace(scan.dev.address, scan.dev);
-    }
-  );
-
-
   log(gen::LogSeverity::DEBUG, ss.str());
+}
+
+void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
+  log_scan_result(scan);
+
+  tasks().push([this, scan]() {
+    const auto &dev = scan.dev;
+
+    auto it = _blue_devices.find(dev.address);
+    if(it == _blue_devices.end() || it->second.name != dev.name) {
+      _blue_devices.emplace(scan.dev.address, scan.dev);
+
+      _blue_view_callback->get_blue_view_controller()->device_list_update(scan.dev);
+    }
+  });
 }
 
 void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) {
@@ -139,6 +137,37 @@ void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &
   }
 }
 
+std::shared_ptr<gen::BlueViewCallback> BlueCallback::on_create(
+  const std::shared_ptr<gen::BlueViewController> &blue_view,
+  const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
+
+  _blue_view_callback = std::make_shared<BlueViewCallback>(blue_view);
+  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
+  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
+  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::COARSE_LOCATION) ? "coarse_location::true" : "coarse_location::false");
+
+  if(!permission_manager->has(gen::Permission::COARSE_LOCATION)) {
+    request_permission(gen::Permission::COARSE_LOCATION, permission_manager);
+  }
+
+  tasks().push([this]() {
+    auto &control = _blue_view_callback->get_blue_view_controller();
+    for(const auto &device : _blue_devices) {
+      control->device_list_update(device.second);
+    }
+  });
+
+  return _blue_view_callback;
+}
+
+void BlueCallback::on_destroy() {
+  if(_blue_view_callback->scan_enabled()) {
+    TASK(,blueManager->scan(false));
+  }
+
+  _blue_view_callback.reset();
+}
+
 
 BlueCallback::~BlueCallback() = default;
 
@@ -147,7 +176,12 @@ void BlueViewCallback::on_power_state_change(gen::BluePowerState blueState) {
     case gen::BluePowerState::OFF:
       log(gen::LogSeverity::DEBUG, "Bluetooth state: OFF");
 
-      TASK(,blueView->blue_enable(true));
+      if(_scan_enabled) {
+        tasks().push([](std::shared_ptr<gen::BlueViewController> blue_view_controller) {
+          blue_view_controller->blue_enable(true);
+        }, _blue_view_controller);
+      }
+
       break;
     case gen::BluePowerState::TURNING_OFF:
       log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING OFF");
@@ -155,66 +189,44 @@ void BlueViewCallback::on_power_state_change(gen::BluePowerState blueState) {
     case gen::BluePowerState::ON:
       log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
 
-      TASK(,blueManager->scan(true));
+      if(_scan_enabled) {
+        TASK(, blueManager->scan(true));
+      }
       break;
     case gen::BluePowerState::TURNING_ON:
       log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING ON");
       break;
   }
 }
+
+void BlueViewCallback::on_toggle_scan(bool scan) {
+  _scan_enabled = scan;
+
+  TASK(scan,blueManager->scan(scan));
+}
+
+void BlueViewCallback::on_select_device(const gen::BlueDevice &dev) {
+  TASK(dev, blueManager->connect_gatt(dev));
+}
+
+
+
 /* namespace bluecast */ }
 
-void start_scan() {
-  bluecast::log(gen::LogSeverity::INFO, "start scanning.");
-  bluecast::blueManager->scan(true);
-  bluecast::tasks().pushTimed([]() {
-    bluecast::blueManager->scan(false);
-  }, std::chrono::seconds(10));
+void request_permission(gen::Permission perm, const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
+  permission_manager->request(
+    perm,
+    std::make_shared<PermFunc>([perm, permission_manager](gen::Permission p, bool granted) {
+      if(!granted) {
+        // Keep pestering the user for permission
+        bluecast::tasks().push(request_permission, perm, permission_manager);
+      }
+    }));
 }
 
-std::shared_ptr<gen::BlueViewCallback> gen::BlueCastInterface::on_create(
-  const std::shared_ptr<gen::BlueViewController> &blue_view,
-  const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
-
-  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
-  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
-  bluecast::log(LogSeverity::DEBUG, permission_manager->has(gen::Permission::COARSE_LOCATION) ? "coarse_location::true" : "coarse_location::false");
-
-  bluecast::blueView = blue_view;
-  if (!bluecast::blueManager->is_enabled()) {
-    bluecast::blueView->blue_enable(true);
-
-    return std::make_shared<bluecast::BlueViewCallback>();
-  }
-
-  if(!permission_manager->has(gen::Permission::COARSE_LOCATION)) {
-    bluecast::tasks().push([permission_manager]() {
-      permission_manager->request(
-        gen::Permission::COARSE_LOCATION,
-        std::make_shared<PermFunc>([](Permission p, bool granted) {
-          if(granted) {
-            bluecast::log(LogSeverity::DEBUG, "coarse_location::true");
-
-            start_scan();
-          } else {
-            bluecast::log(LogSeverity::DEBUG, "coarse_location::false");
-          }
-        }));
-    });
-  } else {
-    TASK(,start_scan());
-  }
-
-  return std::make_shared<bluecast::BlueViewCallback>();
-}
-
-void gen::BlueCastInterface::on_destroy() { }
-
-void gen::BlueCastInterface::config(
+std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::config(
   const std::shared_ptr<gen::BlueController> &blue_manager) {
   bluecast::blueManager = blue_manager;
-
-
 
   bluecast::thread().run(
     [] () {
@@ -233,8 +245,6 @@ void gen::BlueCastInterface::config(
 
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }, []() {});
-}
 
-std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::get_callback() {
   return std::make_shared<bluecast::BlueCallback>();
 }

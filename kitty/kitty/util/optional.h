@@ -128,6 +128,34 @@ public:
   elem_t& operator*() {
     return _obj.get();
   }
+
+  bool operator==(const Optional &other) const {
+    if(isEnabled()) {
+      return other.isEnabled() && _obj.get() == other._obj.get();
+    }
+
+    return !other.isEnabled();
+  }
+
+  bool operator!=(const Optional &other) const {
+    return !(*this == other);
+  }
+
+  bool operator>(const Optional &other) const {
+    return isEnabled() && (!other.isEnabled() || _obj.get() > other._obj.get());
+  }
+
+  bool operator<(const Optional &other) const {
+    return !(*this >= other);
+  }
+
+  bool operator>=(const Optional &other) const {
+    return (*this == other) || (*this > other);
+  }
+
+  bool operator<=(const Optional &other) const {
+    return !(*this > other);
+  }
 };
 }
 #endif // OPTIONAL_H
