@@ -8,10 +8,14 @@
 #include <map>
 
 #include <blue_cast_interface.hpp>
+
 #include <blue_callback.hpp>
 #include <blue_view_callback.hpp>
-#include <blue_power_state.hpp>
 
+#include <blue_power_state.hpp>
+#include <blue_beacon.hpp>
+
+#include <kitty/util/task_pool.h>
 namespace bluecast {
 
 class BlueViewCallback : public gen::BlueViewCallback {
@@ -34,8 +38,15 @@ public:
 
 
 class BlueCallback : public gen::BlueCallback {
+  struct beacon_t {
+    gen::BlueBeacon beacon;
+    util::TaskPool::task_id_t beacon_timeout_id;
+  };
+
   std::shared_ptr<BlueViewCallback> _blue_view_callback;
-  std::map<std::string, gen::BlueBeacon> _blue_beacons;
+
+  // The util::TaskPool::task_id_t is necessary for the beacon timeout
+  std::map<std::string, beacon_t> _blue_beacons;
 public:
   void on_scan_result(const gen::BlueScanResult &scan) override;
 

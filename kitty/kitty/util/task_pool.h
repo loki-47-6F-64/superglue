@@ -15,8 +15,21 @@ namespace util {
 class TaskPool {
 public:
   typedef std::unique_ptr<_ImplBase> __task;
-  
+  typedef _ImplBase* task_id_t;
+
+
   typedef std::chrono::steady_clock::time_point __time_point;
+
+  template<class R>
+  class timer_task_t {
+  public:
+    task_id_t task_id;
+    std::future<R> future;
+
+    timer_task_t(task_id_t _task_id, std::future<R> &future) : task_id(_task_id) {
+      this->future.swap(future);
+    }
+  };
 private:
   std::deque<__task> _tasks;
   std::vector<std::pair<__time_point, __task>> _timer_tasks; 
@@ -41,6 +54,9 @@ public:
     return future;
   }
 
+  /**
+   * @return an id to potentially delay the task
+   */
   template<class Function, class X, class Y, class... Args>
   auto pushTimed(Function &&newTask, std::chrono::duration<X, Y> duration, Args &&... args) {
     typedef decltype(newTask(std::forward<Args>(args)...)) __return;
@@ -63,11 +79,44 @@ public:
         break;
       }
     }
-    _timer_tasks.emplace(it, time_point, toRunnable(std::move(task)));
-    
-    return future;
+
+    auto runnable = toRunnable(std::move(task));
+
+    task_id_t task_id = &*runnable;
+    _timer_tasks.emplace(it, time_point, std::move(runnable));
+
+    return timer_task_t<__return> { task_id, future };
   }
-  
+
+  /**
+   * @param duration The delay before executing the task
+   */
+  template<class X, class Y>
+  void delayTask(task_id_t task_id, std::chrono::duration<X, Y> duration) {
+    std::lock_guard<std::mutex> lg(_task_mutex);
+
+    auto it = _timer_tasks.begin();
+    for(; it < _timer_tasks.cend(); ++it) {
+      const __task &task = std::get<1>(*it);
+
+      if(&*task == task_id) {
+        std::get<0>(*it) = std::chrono::steady_clock::now() + duration;
+
+        break;
+      }
+    }
+
+    // smaller time goes to the back
+    auto prev = it -1;
+    while(it > _timer_tasks.cbegin()) {
+      if(std::get<0>(*it) > std::get<0>(*prev)) {
+        std::swap(*it, *prev);
+      }
+
+      --prev; --it;
+    }
+  }
+
   util::Optional<__task> pop() {
     std::lock_guard<std::mutex> lg(_task_mutex);
     
@@ -100,7 +149,7 @@ private:
   
   template<class Function>
   std::unique_ptr<_ImplBase> toRunnable(Function &&f) {
-    return util::mk_uniq<_Impl<Function>>(std::move(f));
+    return util::mk_uniq<_Impl<Function>>(std::forward<Function&&>(f));
   }
 };
 }

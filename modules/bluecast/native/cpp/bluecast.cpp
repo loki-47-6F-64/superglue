@@ -82,10 +82,10 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
     auto &dev = scan.dev;
 
     auto it = _blue_beacons.find(dev.address);
-    if(it != _blue_beacons.end() && it->second.device.name != dev.name) {
-      it->second.device = std::move(dev);
+    if(it != _blue_beacons.end() && it->second.beacon.device.name != dev.name) {
+      it->second.beacon.device = std::move(dev);
 
-      _blue_view_callback->get_blue_view_controller()->beacon_list_update(it->second);
+      _blue_view_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
     }
   }, util::cmove(const_cast<gen::BlueScanResult&>(scan)));
 }
@@ -156,7 +156,7 @@ std::shared_ptr<gen::BlueViewCallback> BlueCallback::on_create(
   tasks().push([this]() {
     auto &control = _blue_view_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
-      control->beacon_list_update(beacon.second);
+      control->beacon_list_update(beacon.second.beacon);
     }
   });
 
@@ -177,7 +177,27 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
   tasks().push([this](gen::BlueBeacon &&beacon) {
     _blue_view_callback->get_blue_view_controller()->beacon_list_update(beacon);
 
-    _blue_beacons.emplace(beacon.device.address, std::move(beacon));
+    auto it = _blue_beacons.find(beacon.device.address);
+
+    util::TaskPool::task_id_t task_id;
+    // If beacon first appears...
+    if(it == _blue_beacons.cend()) {
+      auto delayed_task = tasks().pushTimed([this](const auto &beacon) {
+        _blue_view_callback->get_blue_view_controller()->beacon_list_remove(beacon);
+
+        _blue_beacons.erase(beacon.address);
+      }, std::chrono::seconds(3), beacon.device);
+
+      task_id = delayed_task.task_id;
+    }
+    else {
+      task_id = it->second.beacon_timeout_id;
+      tasks().delayTask(task_id, std::chrono::seconds(3));
+    }
+
+    std::string address = beacon.device.address;
+    _blue_beacons.emplace(address, beacon_t { std::move(beacon), task_id });
+
   }, util::cmove(_beacon));
 }
 
