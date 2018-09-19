@@ -21,12 +21,6 @@ if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     set(KITTY_BUILD_SSL ON)
     add_subdirectory(kitty)
   
-    find_package(Kitty
-      REQUIRED
-      PATHS "${PROJECT_BINARY_DIR}/kitty"
-      NO_DEFAULT_PATH
-    )
-  
     add_subdirectory(src)
     add_subdirectory(objc)
 
@@ -44,11 +38,6 @@ if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     endif()
   
     add_subdirectory(kitty)
-    find_package(Kitty
-      REQUIRED
-      PATHS "${PROJECT_BINARY_DIR}/kitty"
-      NO_DEFAULT_PATH
-    )
   
     find_package(Threads REQUIRED)
     add_subdirectory(src)
