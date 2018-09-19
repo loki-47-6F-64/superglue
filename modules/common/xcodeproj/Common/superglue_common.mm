@@ -9,7 +9,7 @@ static BOOL loaded = false;
 
 + (void) init {
   if(!loaded) {
-    [uCommonInterface config:[[LogImpl alloc] init] threadManager:[[ThreadImpl alloc] init] fileManager:[[FileImpl alloc] init]];
+    [uCommonInterface init:[[LogImpl alloc] init] threadManager:[[ThreadImpl alloc] init] fileManager:[[FileImpl alloc] init]];
     loaded = true;
   }
 }

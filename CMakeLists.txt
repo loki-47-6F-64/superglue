@@ -18,7 +18,6 @@ if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     add_definitions( -DLACKS_FEATURE_THREAD_LOCAL )
     set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libs/${IOS_PLATFORM})
   
-    set(KITTY_BUILD_SSL ON)
     add_subdirectory(kitty)
   
     add_subdirectory(src)

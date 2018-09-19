@@ -23,9 +23,7 @@
 		4BB13EE4211CAE5700F4B241 /* libkitty-ssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDA211CAE5700F4B241 /* libkitty-ssl.a */; };
 		4BB13EE5211CAE5700F4B241 /* libkitty-log.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDB211CAE5700F4B241 /* libkitty-log.a */; };
 		4BB13EE6211CAE5700F4B241 /* libsuperglueC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDC211CAE5700F4B241 /* libsuperglueC.a */; };
-		4BB13EE7211CAE5700F4B241 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDD211CAE5700F4B241 /* libcrypto.a */; };
 		4BB13EE8211CAE5700F4B241 /* libkitty-server.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDE211CAE5700F4B241 /* libkitty-server.a */; };
-		4BB13EE9211CAE5700F4B241 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDF211CAE5700F4B241 /* libssl.a */; };
 		4BB13EEA211CAE5700F4B241 /* libsuperglue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EE0211CAE5700F4B241 /* libsuperglue.a */; };
 /* End PBXBuildFile section */
 
@@ -77,10 +75,8 @@
 				4BB13EE3211CAE5700F4B241 /* libkitty-utils.a in Frameworks */,
 				4BB13EE4211CAE5700F4B241 /* libkitty-ssl.a in Frameworks */,
 				4BB13EE5211CAE5700F4B241 /* libkitty-log.a in Frameworks */,
-				4BB13EE6211CAE5700F4B241 /* libsuperglueC.a in Frameworks */,
-				4BB13EE7211CAE5700F4B241 /* libcrypto.a in Frameworks */,
 				4BB13EE8211CAE5700F4B241 /* libkitty-server.a in Frameworks */,
-				4BB13EE9211CAE5700F4B241 /* libssl.a in Frameworks */,
+				4BB13EE6211CAE5700F4B241 /* libsuperglueC.a in Frameworks */,
 				4BB13EEA211CAE5700F4B241 /* libsuperglue.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
