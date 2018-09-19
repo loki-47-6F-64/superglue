@@ -27,6 +27,15 @@ blue_scan_result = record {
   connectable : bool;
 }
 
+blue_beacon = record {
+  device : blue_device;
+
+  uuid : string;
+  major : i32;
+  minor : i32;
+  distance : f64;
+}
+
 blue_gatt_descriptor = interface {
   uuid() : string;
 }
@@ -68,6 +77,8 @@ blue_callback = interface +c {
 
   on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
 
+  on_beacon_update(beacon : blue_beacon);
+
   # Creating the functions that need an activity to run
   on_create(
     blue_view : blue_view_controller,
@@ -80,7 +91,8 @@ blue_callback = interface +c {
 blue_view_controller = interface +j +o {
   blue_enable(enable : bool);
 
-  device_list_update(device : blue_device);
+  beacon_list_update(beacon : blue_beacon);
+  beacon_list_remove(beacon : blue_device);
 }
 
 blue_controller = interface +j +o {

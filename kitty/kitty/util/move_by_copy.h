@@ -15,7 +15,7 @@ private:
   move_type _to_move;
 public:
 
-  MoveByCopy(move_type &&to_move) : _to_move(std::move(to_move)) { }
+  explicit MoveByCopy(move_type &&to_move) : _to_move(std::move(to_move)) { }
 
   MoveByCopy(MoveByCopy &&other) = default;
   
@@ -35,11 +35,6 @@ public:
     return std::move(_to_move);
   }
 };
-
-template<class T>
-MoveByCopy<T> cmove(T &&movable) {
-  return MoveByCopy<T>(std::move(movable));
-}
 
 template<class T>
 MoveByCopy<T> cmove(T &movable) {

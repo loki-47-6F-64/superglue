@@ -35,16 +35,16 @@ public:
 
 class BlueCallback : public gen::BlueCallback {
   std::shared_ptr<BlueViewCallback> _blue_view_callback;
-  std::map<std::string, gen::BlueDevice> _blue_devices;
+  std::map<std::string, gen::BlueBeacon> _blue_beacons;
 public:
   void on_scan_result(const gen::BlueScanResult &scan) override;
 
   void on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) override;
-
   void on_gatt_connection_state_change(const std::shared_ptr<gen::BlueGatt> &gatt, gen::BlueGattConnectionState new_state) override;
-
   void on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &gatt,
                               const std::shared_ptr<gen::BlueGattCharacteristic> &characteristic, bool result) override;
+
+  void on_beacon_update(const gen::BlueBeacon &beacon) override;
 
   std::shared_ptr<gen::BlueViewCallback> on_create(const std::shared_ptr<gen::BlueViewController> &blue_view,
                                                    const std::shared_ptr<gen::PermissionInterface> &permission_manager) override;

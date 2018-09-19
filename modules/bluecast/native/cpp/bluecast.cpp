@@ -11,6 +11,8 @@
 #include <blue_controller.hpp>
 #include <blue_view_controller.hpp>
 
+#include <blue_beacon.hpp>
+
 #include <blue_gatt.hpp>
 #include <blue_gatt_service.hpp>
 #include <blue_gatt_characteristic.hpp>
@@ -21,6 +23,7 @@
 
 #include <kitty/util/auto_run.h>
 #include <kitty/util/thread_pool.h>
+#include <kitty/util/move_by_copy.h>
 
 #include "config.hpp"
 #include "thread_t.hpp"
@@ -75,16 +78,16 @@ void log_scan_result(const gen::BlueScanResult &scan) {
 void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   log_scan_result(scan);
 
-  tasks().push([this, scan]() {
-    const auto &dev = scan.dev;
+  tasks().push([this](gen::BlueScanResult &&scan) {
+    auto &dev = scan.dev;
 
-    auto it = _blue_devices.find(dev.address);
-    if(it == _blue_devices.end() || it->second.name != dev.name) {
-      _blue_devices.emplace(scan.dev.address, scan.dev);
+    auto it = _blue_beacons.find(dev.address);
+    if(it != _blue_beacons.end() && it->second.device.name != dev.name) {
+      it->second.device = std::move(dev);
 
-      _blue_view_callback->get_blue_view_controller()->device_list_update(scan.dev);
+      _blue_view_callback->get_blue_view_controller()->beacon_list_update(it->second);
     }
-  });
+  }, util::cmove(const_cast<gen::BlueScanResult&>(scan)));
 }
 
 void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) {
@@ -152,8 +155,8 @@ std::shared_ptr<gen::BlueViewCallback> BlueCallback::on_create(
 
   tasks().push([this]() {
     auto &control = _blue_view_callback->get_blue_view_controller();
-    for(const auto &device : _blue_devices) {
-      control->device_list_update(device.second);
+    for(const auto &beacon : _blue_beacons) {
+      control->beacon_list_update(beacon.second);
     }
   });
 
@@ -168,6 +171,15 @@ void BlueCallback::on_destroy() {
   _blue_view_callback.reset();
 }
 
+void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
+  auto &_beacon = const_cast<gen::BlueBeacon&>(beacon);
+
+  tasks().push([this](gen::BlueBeacon &&beacon) {
+    _blue_view_callback->get_blue_view_controller()->beacon_list_update(beacon);
+
+    _blue_beacons.emplace(beacon.device.address, std::move(beacon));
+  }, util::cmove(_beacon));
+}
 
 BlueCallback::~BlueCallback() = default;
 
@@ -202,7 +214,14 @@ void BlueViewCallback::on_power_state_change(gen::BluePowerState blueState) {
 void BlueViewCallback::on_toggle_scan(bool scan) {
   _scan_enabled = scan;
 
-  TASK(scan,blueManager->scan(scan));
+
+  tasks().push([](auto view, auto scan) {
+    if(scan && !blueManager->is_enabled()) {
+      view->blue_enable(true);
+    } else {
+      blueManager->scan(scan);
+    }
+  }, _blue_view_controller, scan);
 }
 
 void BlueViewCallback::on_select_device(const gen::BlueDevice &dev) {
