@@ -8,7 +8,7 @@
 
 namespace file {
 io ioRead(const char *file_path) {
-  return file::io { 0, ::open(file_path, O_RDONLY, 0) };
+  return file::io { std::chrono::seconds(0), ::open(file_path, O_RDONLY, 0) };
 }
 
 io ioRead(std::string &file_path) { return ioRead(file_path.c_str()); }
@@ -21,7 +21,7 @@ io ioWrite(const char *file_path) {
     S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
   );
 
-  return file::io { 0, _fd };
+  return file::io { std::chrono::seconds(0), _fd };
 }
 
 io ioWrite(std::string &file_path) { return ioWrite(file_path.c_str()); }
@@ -34,7 +34,7 @@ io ioWriteAppend(const char *file_path) {
     S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
   );
 
-  return io { 0, _fd };
+  return io { std::chrono::seconds(0), _fd };
 }  
 
 io ioWriteAppend(std::string &file_path) { return ioWriteAppend(file_path.c_str()); }

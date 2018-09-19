@@ -17,12 +17,12 @@ class Optional {
     
   public:
     object() : _obj_p(nullptr) {}
-    object(obj_t &&obj) {
+    explicit object(obj_t &&obj) {
       // Call constructor at the address of _obj
       _obj_p = new (_obj) obj_t(std::move(obj));
     }
 
-    object(const obj_t &obj) {
+    explicit object(const obj_t &obj) {
       // Call constructor at the address of _obj
       _obj_p = new (_obj) obj_t(obj);
     }
@@ -49,7 +49,8 @@ class Optional {
         }
       }
       else if(constructed()) {
-        other._obj_p = new (other._obj) obj_t(std::move(get()));
+        _obj_p->~obj_t();
+        _obj_p = nullptr;
       }
       
       return *this;
@@ -63,6 +64,10 @@ class Optional {
         } else {
           _obj_p = new (_obj) obj_t(other.get());
         }
+      }
+      else if(constructed()) {
+        _obj_p->~obj_t();
+        _obj_p = nullptr;
       }
 
       return *this;
@@ -94,8 +99,8 @@ public:
   Optional(elem_t &&val) : _obj(std::move(val)) {}
   Optional(const elem_t &val) : _obj(val) {}
   
-  elem_t &operator = (elem_t &&elem) { _obj = std::move(elem); return _obj.get(); }
-  elem_t &operator = (const elem_t &elem) { _obj = elem; return _obj.get(); }
+  Optional &operator = (elem_t &&elem) { _obj = std::move(elem); return *this; }
+  Optional &operator = (const elem_t &elem) { _obj = elem; return *this; }
   
   bool isEnabled() const {
     return _obj.constructed();
@@ -129,32 +134,68 @@ public:
     return _obj.get();
   }
 
-  bool operator==(const Optional &other) const {
-    if(isEnabled()) {
-      return other.isEnabled() && _obj.get() == other._obj.get();
+  template<class X>
+  bool operator==(const Optional<X> &other) const {
+    if(other.isEnabled()) {
+      return (*this == other._obj.get());
     }
 
-    return !other.isEnabled();
+    return !isEnabled();
   }
 
-  bool operator!=(const Optional &other) const {
+  template<class X>
+  bool operator!=(const Optional<X> &other) const {
     return !(*this == other);
   }
 
-  bool operator>(const Optional &other) const {
-    return isEnabled() && (!other.isEnabled() || _obj.get() > other._obj.get());
+  template<class X>
+  bool operator>(const Optional<X> &other) const {
+    return other.isEnabled() && (*this > other._obj.get());
   }
 
-  bool operator<(const Optional &other) const {
+  template<class X>
+  bool operator<(const Optional<X> &other) const {
     return !(*this >= other);
   }
 
-  bool operator>=(const Optional &other) const {
+  template<class X>
+  bool operator>=(const Optional<X> &other) const {
     return (*this == other) || (*this > other);
   }
 
-  bool operator<=(const Optional &other) const {
+  template<class X>
+  bool operator<=(const Optional<X> &other) const {
     return !(*this > other);
+  }
+
+  template<class X>
+  bool operator==(const X &value) const {
+    return isEnabled() && _obj.get() == value;
+  }
+
+  template<class X>
+  bool operator!=(const X &value) const {
+    return !(*this == value);
+  }
+
+  template<class X>
+  bool operator<(const X &value) const {
+    return !isEnabled() || _obj.get() < value;
+  }
+
+  template<class X>
+  bool operator>(const X &value) const {
+    return !(*this < value || *this == value);
+  }
+
+  template<class X>
+  bool operator>=(const X &value) const {
+    return !(*this < value);
+  }
+
+  template<class X>
+  bool operator<=(const X &value) const {
+    return !(*this > value);
   }
 };
 }

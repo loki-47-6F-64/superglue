@@ -1,3 +1,4 @@
+#include <cstring>
 #include <mutex>
 
 #include <unistd.h>
@@ -108,14 +109,14 @@ Context init_ctx_client(std::string&& caPath) {
 }
 
 file::ssl connect(Context &ctx, const char *hostname, const char* port) {
-  constexpr long timeout = 0;
+  constexpr std::chrono::seconds timeout { 0 };
 
   int serverFd = socket(AF_INET, SOCK_STREAM, 0);
 
   addrinfo hints;
   addrinfo *server;
 
-  memset(&hints, 0, sizeof (hints));
+  std::memset(&hints, 0, sizeof (hints));
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
@@ -146,7 +147,7 @@ file::ssl connect(Context &ctx, const char *hostname, const char* port) {
 }
 
 file::ssl accept(ssl::Context &ctx, int fd) {
-  constexpr long timeout = 3000 * 1000;
+  constexpr std::chrono::seconds timeout { 3 };
 
   file::ssl socket(timeout, ctx, fd);
   if(SSL_accept(socket.getStream()._ssl.get()) != 1) {

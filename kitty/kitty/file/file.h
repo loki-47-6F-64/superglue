@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <vector>
+#include <chrono>
 
 #include <sys/select.h>
 
@@ -16,13 +17,13 @@ namespace file {
 /* Represents file in memory, storage or socket */
 template <class Stream>
 class FD { /* File descriptor */
-  typedef decltype(timeval::tv_usec) usec_t;
+  typedef std::chrono::milliseconds duration_t;
   Stream _stream;
 
   // Change of cacheSize only affects next load
   static constexpr std::vector<uint8_t>::size_type _cacheSize = 1024;
   
-  usec_t _microsec;
+  duration_t _millisec;
   
     
   std::vector<uint8_t> _cache;
@@ -34,7 +35,7 @@ public:
     _stream = std::move(other._stream);
     
     _data_p   = other._data_p;
-    _microsec = other._microsec;
+    _millisec = other._millisec;
   }
 
   FD& operator=(FD && other) {
@@ -42,16 +43,16 @@ public:
     _cache = std::move(other._cache);
 
     std::swap(_data_p, other._data_p);
-    std::swap(_microsec, other._microsec);
+    std::swap(_millisec, other._millisec);
     
     return *this;
   }
 
   FD() = default;
 
-  template<class... Args>
-  FD(usec_t microsec, Args && ... params)
-  : _stream(std::forward<Args>(params)...), _microsec(microsec), _data_p(0) {}
+  template<class T1, class T2, class... Args>
+  FD(std::chrono::duration<T1,T2> duration, Args && ... params)
+  : _stream(std::forward<Args>(params)...), _millisec(std::chrono::duration_cast<duration_t>(duration)), _data_p(0) {}
 
   ~FD() { seal(); }
 
@@ -175,8 +176,13 @@ public:
 
 private:
   int _select(const int read) {
-    if(_microsec > 0) {
-      timeval tv { _microsec / (1000 * 1000), _microsec % (1000*1000) };
+    if(_millisec.count() > 0) {
+      suseconds_t dur_micro = std::chrono::duration_cast<std::chrono::microseconds>(_millisec).count();
+      timeval tv {
+        0,
+        dur_micro
+      };
+
       fd_set selected;
 
       FD_ZERO(&selected);

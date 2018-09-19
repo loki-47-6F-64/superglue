@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <memory>
+#include <type_traits>
+#include <algorithm>
+
 
 #include <kitty/util/optional.h>
 #include <kitty/file/file.h>
@@ -149,5 +152,68 @@ FakeContainer<T> toContainer(T * const begin) {
   return toContainer(begin, end);
 }
 
-}
+namespace endian {
+template<class T = void>
+struct endianness {
+  enum : bool {
+#if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
+    defined(__BIG_ENDIAN__) || \
+    defined(__ARMEB__) || \
+    defined(__THUMBEB__) || \
+    defined(__AARCH64EB__) || \
+    defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
+    // It's a big-endian target architecture
+    little = false,
+#elif defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN || \
+    defined(__LITTLE_ENDIAN__) || \
+    defined(__ARMEL__) || \
+    defined(__THUMBEL__) || \
+    defined(__AARCH64EL__) || \
+    defined(_MIPSEL) || defined(__MIPSEL) || defined(__MIPSEL__)
+    // It's a little-endian target architecture
+    little = true,
+#else
+#error "Unknown Endianness"
+#endif
+    big = !little
+  };
+};
+
+template<class T, class S = void>
+struct endian_helper { };
+
+template<class T>
+struct endian_helper<T, std::enable_if_t<endianness<T>::little>> {
+  static inline T big(T x) {
+    uint8_t *data = reinterpret_cast<uint8_t*>(&x);
+
+    std::reverse(data, data + sizeof(x));
+
+    return x;
+  }
+
+  static inline T little(T x) { return x; }
+};
+
+template<class T>
+struct endian_helper<T, std::enable_if_t<endianness<T>::big>> {
+  static inline T little(T x) {
+    uint8_t *data = reinterpret_cast<uint8_t*>(&x);
+
+    std::reverse(data, data + sizeof(x));
+
+    return x;
+  }
+
+  static inline T big(T x) { return x; }
+};
+
+template<class T>
+inline auto little(T x) { return endian_helper<T>::little(x); }
+
+template<class T>
+inline auto big(T x) { return endian_helper<T>::big(x); }
+} /* endian */
+
+} /* util */
 #endif

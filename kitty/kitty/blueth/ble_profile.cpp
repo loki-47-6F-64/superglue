@@ -660,7 +660,7 @@ int Profile::main(server::BlueClient &client) const {
 
     if (!requestType) {
       if(err::code == err::TIMEOUT) {
-	client.socket->seal();
+        client.socket->seal();
       }
       
       break;

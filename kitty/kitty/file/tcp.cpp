@@ -12,7 +12,7 @@ extern void set(const char *err);
 
 namespace file {
 io connect(const char *hostname, const char *port) {
-  constexpr long timeout = 0;
+  constexpr std::chrono::seconds timeout { 0 };
   
   addrinfo hints;
   addrinfo *server;

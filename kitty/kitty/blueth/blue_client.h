@@ -6,8 +6,9 @@
 
 #include <kitty/blueth/blueth.h>
 #include <kitty/blueth/ble.h>
-#include <kitty/blueth/blue_stream.h>
+#include <kitty/file/io_stream.h>
 #include <kitty/server/server.h>
+#include "blue_stream.h"
 
 namespace server {
 

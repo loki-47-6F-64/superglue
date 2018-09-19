@@ -4,6 +4,7 @@
 
 #include <kitty/blueth/blue_client.h>
 #include <kitty/util/utility.h>
+
 namespace server {
 template<>
 util::Optional<bluetooth::Client> bluetooth::_accept() {
@@ -19,8 +20,8 @@ util::Optional<bluetooth::Client> bluetooth::_accept() {
 
   auto dev = bt::device(client_addr.l2_bdaddr, 0);
   return Client {
-    util::mk_uniq<file::blueth>(3000 * 1000, client_fd, *_member, dev),
-    { client_addr.l2_bdaddr, 0 },
+    util::mk_uniq<file::blueth>(std::chrono::seconds(3), client_fd, *_member, dev),
+    dev,
     23,
     nullptr,
     Client::LOW

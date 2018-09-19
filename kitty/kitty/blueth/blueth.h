@@ -28,11 +28,11 @@ struct device {
   bdaddr(bdaddr), rssi(rssi) { }
 
   device(const char *bdaddr, int8_t rssi) :
-  rssi(rssi) {
+    rssi(rssi) {
     str2ba(bdaddr, &this->bdaddr);
   }
 
-  operator std::string() {
+  explicit operator std::string() {
     std::string bdaddr;
     bdaddr.resize(18);
 
@@ -50,24 +50,27 @@ class HCI : public device {
   
 public:
   HCI();
-  HCI(const char *bdaddr);
-  HCI(HCI &&dev);
+  explicit HCI(const char *bdaddr);
+  HCI(HCI &&dev) noexcept;
 
   ~HCI();
 
-  void operator =(HCI &&dev);
+  HCI& operator =(HCI &&dev) noexcept;
+
+  int advertisingEnable(uint16_t min_interval, uint16_t max_interval, bool enable);
 
   /*
    * Data broadcasted. The receiver doesn't need to create a connection.
    */
   int broadcast(uint8_t *data, uint8_t length);
   int broadcast(const std::vector< bt::Uuid > &uuids);
-  
+
+  int ibeacon(const Uuid &uuid, uint16_t major, uint16_t minor, uint8_t txPower);
+
   /*
-   * Start or stop advertising.
-   * name could be a nullptr
+   * Respond with name on scan from remote device
    */
-  int advertise(bool enable, const char *name);
+  int scanResponse(const char *name);
   
   int disconnect(uint16_t handle);
   optional getConnHandle(device &dev);

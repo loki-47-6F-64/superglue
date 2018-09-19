@@ -17,7 +17,7 @@ util::Optional<tcp::Client> tcp::_accept() {
   inet_ntop(AF_INET6, &client_addr.sin6_addr, ip_buf, INET6_ADDRSTRLEN);
 
   return Client {
-    util::mk_uniq<file::io>(3000 * 1000, client_fd), {
+    util::mk_uniq<file::io>(std::chrono::seconds(3), client_fd), {
       ip_buf
     }
   };

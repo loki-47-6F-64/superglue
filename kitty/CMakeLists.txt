@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Kitty)
 
-
 set(KITTY_MAJOR_VERSION 1)
 set(KITTY_MINOR_VERSION 0)
 set(KITTY_PATCH_VERSION 0)
@@ -11,7 +10,7 @@ set(KITTY_VERSION
   ${KITTY_MAJOR_VERSION}.${KITTY_MINOR_VERSION}.${KITTY_PATCH_VERSION}
 )
 
-# Clang on XCode 6 doesn't support -std=c++14
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-missing-braces -std=c++14")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
@@ -28,7 +27,7 @@ if(KITTY_BUILD_SSL OR KITTY_BUILD_BLUETOOTH)
   set(KITTY_BUILD_SERVER ON)
 endif()
 
-set(KITTY_TARGETS
+set(KITTY_LIBRARIES
   kitty-err
   kitty-file
   kitty-log
@@ -70,36 +69,24 @@ add_subdirectory(kitty/file)
 add_subdirectory(kitty/log)
 
 if(KITTY_BUILD_SERVER)
-  set(KITTY_TARGETS ${KITTY_TARGETS} kitty-server)
+  set(KITTY_LIBRARIES ${KITTY_LIBRARIES} kitty-server)
   add_subdirectory(kitty/server)
 endif()
 
 if(KITTY_BUILD_SSL)
-  set(KITTY_TARGETS ${KITTY_TARGETS} kitty-ssl)
+  set(KITTY_LIBRARIES ${KITTY_LIBRARIES} kitty-ssl)
   add_subdirectory(kitty/ssl)
 endif()
 
 if(KITTY_BUILD_BLUETOOTH)  
-  set(KITTY_TARGETS ${KITTY_TARGETS} kitty-bluetooth)
+  set(KITTY_LIBRARIES ${KITTY_LIBRARIES} kitty-bluetooth)
   add_subdirectory(kitty/blueth)
 endif()
 
-list(REVERSE KITTY_TARGETS)
-# Add all targets to the build-tree export set
-export(TARGETS ${KITTY_TARGETS}
-  FILE "${PROJECT_BINARY_DIR}/KittyTargets.cmake"
-)
- 
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export(PACKAGE Kitty)
- 
-# ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
-configure_file(KittyConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/KittyConfig.cmake" @ONLY
-)
-  
-configure_file(KittyConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/KittyConfigVersion.cmake" @ONLY
-)
+set(KITTY_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/kitty KITTY_INCLUDE_DIR)
+set(KITTY_INCLUDE_DIR ${KITTY_INCLUDE_DIR} PARENT_SCOPE)
+
+set(KITTY_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/kitty)
+set(KITTY_INCLUDE_DIRS ${KITTY_INCLUDE_DIRS} PARENT_SCOPE)
+
+set(KITTY_LIBRARIES ${KITTY_LIBRARIES} PARENT_SCOPE)
