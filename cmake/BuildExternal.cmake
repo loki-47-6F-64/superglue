@@ -122,3 +122,16 @@ foreach(TARGET_LIB ${INSTALL_LIBS})
 endforeach()
 
 install(FILES ${TARGET_LIB_FILES} DESTINATION ${INSTALL_DESTINATION})
+
+if(BUILD_EXTERNAL_MULTI_ARCH AND ${TARGET_PLATFORM} STREQUAL ANDROID)
+  foreach(JAVA_SOURCE_DIR ${MODULE_DIRS})
+    get_filename_component(DIR_NAME ${JAVA_SOURCE_DIR} NAME)
+    install(DIRECTORY ${JAVA_SOURCE_DIR} DESTINATION "."
+            PATTERN "*.djinni" EXCLUDE
+            PATTERN "${DIR_NAME}/build"  EXCLUDE
+            PATTERN "${DIR_NAME}/native" EXCLUDE
+            PATTERN "${DIR_NAME}/xcodeproj" EXCLUDE
+            PATTERN "*.iml" EXCLUDE
+            )
+  endforeach()
+endif()

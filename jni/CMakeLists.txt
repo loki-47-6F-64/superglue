@@ -53,14 +53,3 @@ install(
     GROUP_READ GROUP_EXECUTE
     WORLD_READ WORLD_EXECUTE
 )
-
-foreach(JAVA_SOURCE_DIR ${MODULE_DIRS})
-  get_filename_component(DIR_NAME ${JAVA_SOURCE_DIR} NAME)
-  install(DIRECTORY ${JAVA_SOURCE_DIR} DESTINATION "."
-    PATTERN "*.djinni" EXCLUDE
-    PATTERN "${DIR_NAME}/build"  EXCLUDE
-    PATTERN "${DIR_NAME}/native" EXCLUDE
-    PATTERN "${DIR_NAME}/xcodeproj" EXCLUDE
-    PATTERN "*.iml" EXCLUDE
-  )
-endforeach()
