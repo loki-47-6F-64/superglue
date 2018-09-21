@@ -9,7 +9,9 @@
 #include <log_severity.hpp>
 #include <blue_scan_result.hpp>
 #include <blue_controller.hpp>
-#include <blue_view_controller.hpp>
+
+#include <blue_view_main_controller.hpp>
+#include <blue_view_display_controller.hpp>
 
 #include <blue_beacon.hpp>
 
@@ -19,32 +21,29 @@
 #include <blue_gatt_descriptor.hpp>
 #include <blue_gatt_connection_state.hpp>
 
-#include <permission.hpp>
-
-#include <kitty/util/auto_run.h>
-#include <kitty/util/thread_pool.h>
 #include <kitty/util/move_by_copy.h>
 
 #include "config.hpp"
-#include "thread_t.hpp"
 #include "bluecast.h"
 #include "permission.h"
 
-#define TASK(x,y) ::bluecast::tasks().push([x] () { y; })
-#define DELAY(x,y,z) ::bluecast::tasks().pushTimed([x] () { y; }, std::chrono::milliseconds(z))
-
-void request_permission(gen::Permission perm, const std::shared_ptr<gen::PermissionInterface> &permission_manager);
+#include "blue_view_main.h"
+#include "blue_view_display.h"
 
 namespace bluecast {
-std::shared_ptr<gen::BlueController> blueManager;
+std::shared_ptr<gen::BlueController> &blueManager() {
+  static std::shared_ptr<gen::BlueController> _blueManager;
 
-auto &tasks() {
+  return _blueManager;
+}
+
+util::TaskPool &tasks() {
   static util::TaskPool taskPool;
 
   return taskPool;
 }
 
-auto &thread() {
+util::AutoRun<thread_t> &thread() {
   static util::AutoRun<thread_t> autoRun;
 
   return autoRun;
@@ -85,7 +84,7 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
     if(it != _blue_beacons.end() && it->second.beacon.device.name != dev.name) {
       it->second.beacon.device = std::move(dev);
 
-      _blue_view_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
+      _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
     }
   }, util::cmove(const_cast<gen::BlueScanResult&>(scan)));
 }
@@ -98,7 +97,7 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
         log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
           log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
-          if(characteristic->uuid() != "00002a00-0000-1000-8000-00805f9b34fb") {
+          if(characteristic->uuid() != "2096d612-39b6-41bf-b511-0f8ade8ef6c0") {
             continue;
           }
 
@@ -138,44 +137,61 @@ void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &
   if(result) {
     log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0));
   }
+
+
+  _blue_view_display_callback->blue_view_display_controller()->display(_blue_view_display_callback->get_device(),characteristic->get_string_value(0));
 }
 
-std::shared_ptr<gen::BlueViewCallback> BlueCallback::on_create(
-  const std::shared_ptr<gen::BlueViewController> &blue_view,
+std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
+  const std::shared_ptr<gen::BlueViewMainController> &blue_view,
   const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
 
-  _blue_view_callback = std::make_shared<BlueViewCallback>(blue_view);
-  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
-  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::BLUETOOTH_ADMIN) ? "bluetooth_admin::true" : "bluetooth_admin::false");
-  bluecast::log(gen::LogSeverity::DEBUG, permission_manager->has(gen::Permission::COARSE_LOCATION) ? "coarse_location::true" : "coarse_location::false");
+  log(gen::LogSeverity::DEBUG, "on_create_main");
 
-  if(!permission_manager->has(gen::Permission::COARSE_LOCATION)) {
-    request_permission(gen::Permission::COARSE_LOCATION, permission_manager);
-  }
+  _blue_view_main_callback = std::make_shared<BlueViewMainCallback>(blue_view, permission_manager);
 
   tasks().push([this]() {
-    auto &control = _blue_view_callback->get_blue_view_controller();
+    auto &control = _blue_view_main_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
       control->beacon_list_update(beacon.second.beacon);
     }
   });
 
-  return _blue_view_callback;
+  return _blue_view_main_callback;
 }
 
-void BlueCallback::on_destroy() {
-  if(_blue_view_callback->scan_enabled()) {
-    TASK(,blueManager->scan(false));
+std::shared_ptr<gen::BlueViewDisplayCallback> BlueCallback::on_create_display(
+  const gen::BlueDevice& device,
+  const std::shared_ptr<gen::BlueViewDisplayController> &blue_view) {
+
+  log(gen::LogSeverity::DEBUG, "on_create_display");
+
+  _blue_view_display_callback = std::make_shared<BlueViewDisplayCallback>(blue_view, device);
+
+  blueManager()->connect_gatt(device);
+
+  return _blue_view_display_callback;
+}
+
+void BlueCallback::on_destroy_main() {
+  log(gen::LogSeverity::DEBUG, "on_destroy_main");
+  if(_blue_view_main_callback->scan_enabled()) {
+    TASK(,blueManager()->scan(false));
   }
 
-  _blue_view_callback.reset();
+  _blue_view_main_callback.reset();
+}
+
+void BlueCallback::on_destroy_display() {
+  log(gen::LogSeverity::DEBUG, "on_destroy_display");
+  _blue_view_display_callback.reset();
 }
 
 void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
   auto &_beacon = const_cast<gen::BlueBeacon&>(beacon);
 
   tasks().push([this](gen::BlueBeacon &&beacon) {
-    _blue_view_callback->get_blue_view_controller()->beacon_list_update(beacon);
+    _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);
 
     auto it = _blue_beacons.find(beacon.device.address);
 
@@ -183,7 +199,7 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
     // If beacon first appears...
     if(it == _blue_beacons.cend()) {
       auto delayed_task = tasks().pushTimed([this](const auto &beacon) {
-        _blue_view_callback->get_blue_view_controller()->beacon_list_remove(beacon);
+        _blue_view_main_callback->get_blue_view_controller()->beacon_list_remove(beacon);
 
         _blue_beacons.erase(beacon.address);
       }, std::chrono::seconds(3), beacon.device);
@@ -203,69 +219,22 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
 
 BlueCallback::~BlueCallback() = default;
 
-void BlueViewCallback::on_power_state_change(gen::BluePowerState blueState) {
-  switch (blueState) {
-    case gen::BluePowerState::OFF:
-      log(gen::LogSeverity::DEBUG, "Bluetooth state: OFF");
-
-      if(_scan_enabled) {
-        tasks().push([](std::shared_ptr<gen::BlueViewController> blue_view_controller) {
-          blue_view_controller->blue_enable(true);
-        }, _blue_view_controller);
-      }
-
-      break;
-    case gen::BluePowerState::TURNING_OFF:
-      log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING OFF");
-      break;
-    case gen::BluePowerState::ON:
-      log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
-
-      if(_scan_enabled) {
-        TASK(, blueManager->scan(true));
-      }
-      break;
-    case gen::BluePowerState::TURNING_ON:
-      log(gen::LogSeverity::DEBUG, "Bluetooth state: TURNING ON");
-      break;
-  }
-}
-
-void BlueViewCallback::on_toggle_scan(bool scan) {
-  _scan_enabled = scan;
-
-
-  tasks().push([](auto view, auto scan) {
-    if(scan && !blueManager->is_enabled()) {
-      view->blue_enable(true);
-    } else {
-      blueManager->scan(scan);
-    }
-  }, _blue_view_controller, scan);
-}
-
-void BlueViewCallback::on_select_device(const gen::BlueDevice &dev) {
-  TASK(dev, blueManager->connect_gatt(dev));
-}
-
-
-
-/* namespace bluecast */ }
-
 void request_permission(gen::Permission perm, const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
   permission_manager->request(
     perm,
     std::make_shared<PermFunc>([perm, permission_manager](gen::Permission p, bool granted) {
       if(!granted) {
         // Keep pestering the user for permission
-        bluecast::tasks().push(request_permission, perm, permission_manager);
+        tasks().push(request_permission, perm, permission_manager);
       }
     }));
 }
 
+/* namespace bluecast */ }
+
 std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::config(
   const std::shared_ptr<gen::BlueController> &blue_manager) {
-  bluecast::blueManager = blue_manager;
+  bluecast::blueManager() = blue_manager;
 
   bluecast::thread().run(
     [] () {
