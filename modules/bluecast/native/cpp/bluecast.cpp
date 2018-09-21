@@ -158,6 +158,10 @@ std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
       return;
     }
 
+    if(_blue_view_main_callback->scan_enabled()) {
+      blueManager()->beacon_scan(true);
+    }
+
     auto &control = _blue_view_main_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
       control->beacon_list_update(beacon.second.beacon);
@@ -185,7 +189,7 @@ void BlueCallback::on_destroy_main() {
 
   TASK(this,
     if(_blue_view_main_callback->scan_enabled()) {
-      blueManager()->scan(false);
+      blueManager()->beacon_scan(false);
     }
 
     _blue_view_main_callback.reset();

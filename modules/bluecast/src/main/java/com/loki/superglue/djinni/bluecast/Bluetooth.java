@@ -43,6 +43,7 @@ public class Bluetooth extends BluetoothGattCallback {
     private static final String IBEACON_LAYOUT = "m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24";
 
     private BeaconManager beaconManager;
+    private BeaconConsumer beaconConsumer;
 
     private BluetoothAdapter btAdap;
 
@@ -63,7 +64,7 @@ public class Bluetooth extends BluetoothGattCallback {
         BeaconManager.setRssiFilterImplClass(ArmaRssiFilter.class);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
 
-        beaconManager.bind(beaconConsumer());
+        beaconConsumer = beaconConsumerImpl();
     }
 
     private BlueController blueController() {
@@ -88,6 +89,16 @@ public class Bluetooth extends BluetoothGattCallback {
                 }
                 else {
                     bleScanner.stopScan(scanCall);
+                }
+            }
+
+            @Override
+            public void beaconScan(boolean enable) {
+                if(enable && !beaconManager.isBound(beaconConsumer)) {
+                    beaconManager.bind(beaconConsumer);
+                }
+                else if(!enable && beaconManager.isBound(beaconConsumer)){
+                    beaconManager.unbind(beaconConsumer);
                 }
             }
         };
@@ -168,7 +179,7 @@ public class Bluetooth extends BluetoothGattCallback {
     }
 
 
-    private BeaconConsumer beaconConsumer() {
+    private BeaconConsumer beaconConsumerImpl() {
         return new BeaconConsumer() {
             @Override
             public void onBeaconServiceConnect() {

@@ -120,6 +120,8 @@ blue_controller = interface +j +o {
   scan(enable : bool);
 
   connect_gatt(dev : blue_device);
+
+  beacon_scan(enable : bool);
 }
 
 blue_cast_interface = interface +c {

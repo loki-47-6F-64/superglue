@@ -47,7 +47,7 @@ void BlueViewMainCallback::on_power_state_change(gen::BluePowerState blueState) 
       log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
 
       if(_scan_enabled) {
-        TASK(, blueManager()->scan(true));
+        TASK(, blueManager()->beacon_scan(true));
       }
       break;
     case gen::BluePowerState::TURNING_ON:
@@ -64,7 +64,7 @@ void BlueViewMainCallback::on_toggle_scan(bool scan) {
     if(scan && !blueManager()->is_enabled()) {
       view->blue_enable(true);
     } else {
-      blueManager()->scan(scan);
+      blueManager()->beacon_scan(scan);
     }
   }, _blue_view_main_controller, scan);
 }
