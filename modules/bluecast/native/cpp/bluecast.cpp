@@ -84,7 +84,9 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
     if(it != _blue_beacons.end() && it->second.beacon.device.name != dev.name) {
       it->second.beacon.device = std::move(dev);
 
-      _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
+      if(_blue_view_main_callback) {
+        _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
+      }
     }
   }, util::cmove(const_cast<gen::BlueScanResult&>(scan)));
 }
@@ -138,8 +140,9 @@ void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &
     log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0));
   }
 
-
-  _blue_view_display_callback->blue_view_display_controller()->display(_blue_view_display_callback->get_device(),characteristic->get_string_value(0));
+  if(_blue_view_display_callback) {
+    _blue_view_display_callback->blue_view_display_controller()->display(_blue_view_display_callback->get_device(), characteristic->get_string_value(0));
+  }
 }
 
 std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
@@ -151,6 +154,10 @@ std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
   _blue_view_main_callback = std::make_shared<BlueViewMainCallback>(blue_view, permission_manager);
 
   tasks().push([this]() {
+    if(!_blue_view_main_callback) {
+      return;
+    }
+
     auto &control = _blue_view_main_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
       control->beacon_list_update(beacon.second.beacon);
@@ -175,23 +182,26 @@ std::shared_ptr<gen::BlueViewDisplayCallback> BlueCallback::on_create_display(
 
 void BlueCallback::on_destroy_main() {
   log(gen::LogSeverity::DEBUG, "on_destroy_main");
-  if(_blue_view_main_callback->scan_enabled()) {
-    TASK(,blueManager()->scan(false));
-  }
 
-  _blue_view_main_callback.reset();
+  TASK(this,
+    if(_blue_view_main_callback->scan_enabled()) {
+      blueManager()->scan(false);
+    }
+
+    _blue_view_main_callback.reset();
+  );
 }
 
 void BlueCallback::on_destroy_display() {
   log(gen::LogSeverity::DEBUG, "on_destroy_display");
-  _blue_view_display_callback.reset();
+  TASK(this, _blue_view_display_callback.reset());
 }
 
 void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
-  auto &_beacon = const_cast<gen::BlueBeacon&>(beacon);
-
   tasks().push([this](gen::BlueBeacon &&beacon) {
-    _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);
+    if(_blue_view_main_callback) {
+      _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);
+    }
 
     auto it = _blue_beacons.find(beacon.device.address);
 
@@ -199,7 +209,10 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
     // If beacon first appears...
     if(it == _blue_beacons.cend()) {
       auto delayed_task = tasks().pushTimed([this](const auto &beacon) {
-        _blue_view_main_callback->get_blue_view_controller()->beacon_list_remove(beacon);
+
+        if(_blue_view_main_callback) {
+          _blue_view_main_callback->get_blue_view_controller()->beacon_list_remove(beacon);
+        }
 
         _blue_beacons.erase(beacon.address);
       }, std::chrono::seconds(3), beacon.device);
@@ -214,7 +227,7 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
     std::string address = beacon.device.address;
     _blue_beacons.emplace(address, beacon_t { std::move(beacon), task_id });
 
-  }, util::cmove(_beacon));
+  }, util::const_cmove(beacon));
 }
 
 BlueCallback::~BlueCallback() = default;

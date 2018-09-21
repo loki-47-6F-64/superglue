@@ -41,5 +41,10 @@ MoveByCopy<T> cmove(T &movable) {
   return MoveByCopy<T>(std::move(movable));
 }
 
+// Do NOT use this unless you are absolutely certain the object to be moved is no longer necessary by the caller
+template<class T>
+MoveByCopy<T> const_cmove(const T &movable) {
+  return MoveByCopy<T>(std::move(const_cast<T&>(movable)));
+}
 }
 #endif
