@@ -1,0 +1,536 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4B079F8F2155784000CBFACC /* uBlueCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F812155783F00CBFACC /* uBlueCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F902155784000CBFACC /* uBlueGattCharacteristic.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F822155783F00CBFACC /* uBlueGattCharacteristic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F912155784000CBFACC /* uBluePowerState.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F832155783F00CBFACC /* uBluePowerState.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F922155784000CBFACC /* uBlueGattService.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F842155783F00CBFACC /* uBlueGattService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F932155784000CBFACC /* uBlueScanResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F852155783F00CBFACC /* uBlueScanResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F942155784000CBFACC /* uBlueGatt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F862155783F00CBFACC /* uBlueGatt.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F952155784000CBFACC /* uBlueCastInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F872155783F00CBFACC /* uBlueCastInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F962155784000CBFACC /* uBlueBeacon.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F882155783F00CBFACC /* uBlueBeacon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F972155784000CBFACC /* uBlueController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F892155784000CBFACC /* uBlueController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F982155784000CBFACC /* uBlueViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8A2155784000CBFACC /* uBlueViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F992155784000CBFACC /* uBlueDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8B2155784000CBFACC /* uBlueDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F9A2155784000CBFACC /* uBlueGattConnectionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F9B2155784000CBFACC /* uBlueGattDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F9C2155784000CBFACC /* uBlueViewCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8E2155784000CBFACC /* uBlueViewCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B079F9E21557CC800CBFACC /* uBlueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F9D21557CC800CBFACC /* uBlueController.swift */; };
+		4B079FA7215591E000CBFACC /* libkitty-err.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079F9F215591DF00CBFACC /* libkitty-err.a */; };
+		4B079FA8215591E000CBFACC /* libkitty-file.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA0215591DF00CBFACC /* libkitty-file.a */; };
+		4B079FA9215591E000CBFACC /* libkitty-utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA1215591DF00CBFACC /* libkitty-utils.a */; };
+		4B079FAA215591E000CBFACC /* libkitty-ssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA2215591E000CBFACC /* libkitty-ssl.a */; };
+		4B079FAB215591E000CBFACC /* libkitty-log.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA3215591E000CBFACC /* libkitty-log.a */; };
+		4B079FAC215591E000CBFACC /* libsuperglueC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA4215591E000CBFACC /* libsuperglueC.a */; };
+		4B079FAD215591E000CBFACC /* libkitty-server.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA5215591E000CBFACC /* libkitty-server.a */; };
+		4B079FAE215591E000CBFACC /* libsuperglue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA6215591E000CBFACC /* libsuperglue.a */; };
+		4B079FB02155929100CBFACC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FAF2155929100CBFACC /* libc++.tbd */; };
+		4B696913215627A1009CDD3E /* GattBind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B696912215627A1009CDD3E /* GattBind.swift */; };
+		4B6969152156295A009CDD3E /* GattCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969142156295A009CDD3E /* GattCharacteristic.swift */; };
+		4B6969172156324B009CDD3E /* GattService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969162156324B009CDD3E /* GattService.swift */; };
+		4B696919215632AE009CDD3E /* GattDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B696918215632AE009CDD3E /* GattDescriptor.swift */; };
+		4BE0A8A221554D0400F9C402 /* Bluecast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A8A021554D0400F9C402 /* Bluecast.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A8B221554D6F00F9C402 /* Common.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE0A8AF21554D6700F9C402 /* Common.framework */; };
+		4BE0A8B621554FB300F9C402 /* Bluecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0A8B521554FB300F9C402 /* Bluecast.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4BE0A8AE21554D6700F9C402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4BE0A8A921554D6700F9C402 /* Common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2CA13EC71B1CA645007937A3;
+			remoteInfo = Common;
+		};
+		4BE0A8B021554D6700F9C402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4BE0A8A921554D6700F9C402 /* Common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2CA13ED21B1CA645007937A3;
+			remoteInfo = CommonTests;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4B079F812155783F00CBFACC /* uBlueCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueCallback.h; path = ../../../../../include/uBlueCallback.h; sourceTree = "<group>"; };
+		4B079F822155783F00CBFACC /* uBlueGattCharacteristic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattCharacteristic.h; path = ../../../../../include/uBlueGattCharacteristic.h; sourceTree = "<group>"; };
+		4B079F832155783F00CBFACC /* uBluePowerState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBluePowerState.h; path = ../../../../../include/uBluePowerState.h; sourceTree = "<group>"; };
+		4B079F842155783F00CBFACC /* uBlueGattService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattService.h; path = ../../../../../include/uBlueGattService.h; sourceTree = "<group>"; };
+		4B079F852155783F00CBFACC /* uBlueScanResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueScanResult.h; path = ../../../../../include/uBlueScanResult.h; sourceTree = "<group>"; };
+		4B079F862155783F00CBFACC /* uBlueGatt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGatt.h; path = ../../../../../include/uBlueGatt.h; sourceTree = "<group>"; };
+		4B079F872155783F00CBFACC /* uBlueCastInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueCastInterface.h; path = ../../../../../include/uBlueCastInterface.h; sourceTree = "<group>"; };
+		4B079F882155783F00CBFACC /* uBlueBeacon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueBeacon.h; path = ../../../../../include/uBlueBeacon.h; sourceTree = "<group>"; };
+		4B079F892155784000CBFACC /* uBlueController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueController.h; path = ../../../../../include/uBlueController.h; sourceTree = "<group>"; };
+		4B079F8A2155784000CBFACC /* uBlueViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewController.h; path = ../../../../../include/uBlueViewController.h; sourceTree = "<group>"; };
+		4B079F8B2155784000CBFACC /* uBlueDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueDevice.h; path = ../../../../../include/uBlueDevice.h; sourceTree = "<group>"; };
+		4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattConnectionState.h; path = ../../../../../include/uBlueGattConnectionState.h; sourceTree = "<group>"; };
+		4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattDescriptor.h; path = ../../../../../include/uBlueGattDescriptor.h; sourceTree = "<group>"; };
+		4B079F8E2155784000CBFACC /* uBlueViewCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewCallback.h; path = ../../../../../include/uBlueViewCallback.h; sourceTree = "<group>"; };
+		4B079F9D21557CC800CBFACC /* uBlueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uBlueController.swift; sourceTree = "<group>"; };
+		4B079F9F215591DF00CBFACC /* libkitty-err.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-err.a"; path = "../../../libs/libkitty-err.a"; sourceTree = "<group>"; };
+		4B079FA0215591DF00CBFACC /* libkitty-file.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-file.a"; path = "../../../libs/libkitty-file.a"; sourceTree = "<group>"; };
+		4B079FA1215591DF00CBFACC /* libkitty-utils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-utils.a"; path = "../../../libs/libkitty-utils.a"; sourceTree = "<group>"; };
+		4B079FA2215591E000CBFACC /* libkitty-ssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-ssl.a"; path = "../../../libs/libkitty-ssl.a"; sourceTree = "<group>"; };
+		4B079FA3215591E000CBFACC /* libkitty-log.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-log.a"; path = "../../../libs/libkitty-log.a"; sourceTree = "<group>"; };
+		4B079FA4215591E000CBFACC /* libsuperglueC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglueC.a; path = ../../../libs/libsuperglueC.a; sourceTree = "<group>"; };
+		4B079FA5215591E000CBFACC /* libkitty-server.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-server.a"; path = "../../../libs/libkitty-server.a"; sourceTree = "<group>"; };
+		4B079FA6215591E000CBFACC /* libsuperglue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglue.a; path = ../../../libs/libsuperglue.a; sourceTree = "<group>"; };
+		4B079FAF2155929100CBFACC /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		4B696912215627A1009CDD3E /* GattBind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattBind.swift; sourceTree = "<group>"; };
+		4B6969142156295A009CDD3E /* GattCharacteristic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattCharacteristic.swift; sourceTree = "<group>"; };
+		4B6969162156324B009CDD3E /* GattService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattService.swift; sourceTree = "<group>"; };
+		4B696918215632AE009CDD3E /* GattDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattDescriptor.swift; sourceTree = "<group>"; };
+		4BE0A89D21554D0400F9C402 /* Bluecast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Bluecast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BE0A8A021554D0400F9C402 /* Bluecast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bluecast.h; sourceTree = "<group>"; };
+		4BE0A8A121554D0400F9C402 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4BE0A8A921554D6700F9C402 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../../common/xcodeproj/Common.xcodeproj; sourceTree = "<group>"; };
+		4BE0A8B521554FB300F9C402 /* Bluecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bluecast.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4BE0A89921554D0400F9C402 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B079FB02155929100CBFACC /* libc++.tbd in Frameworks */,
+				4B079FA7215591E000CBFACC /* libkitty-err.a in Frameworks */,
+				4B079FA8215591E000CBFACC /* libkitty-file.a in Frameworks */,
+				4B079FA9215591E000CBFACC /* libkitty-utils.a in Frameworks */,
+				4B079FAA215591E000CBFACC /* libkitty-ssl.a in Frameworks */,
+				4B079FAB215591E000CBFACC /* libkitty-log.a in Frameworks */,
+				4B079FAC215591E000CBFACC /* libsuperglueC.a in Frameworks */,
+				4B079FAD215591E000CBFACC /* libkitty-server.a in Frameworks */,
+				4B079FAE215591E000CBFACC /* libsuperglue.a in Frameworks */,
+				4BE0A8B221554D6F00F9C402 /* Common.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4B079F80215577AF00CBFACC /* Superglue */ = {
+			isa = PBXGroup;
+			children = (
+				4B079F882155783F00CBFACC /* uBlueBeacon.h */,
+				4B079F812155783F00CBFACC /* uBlueCallback.h */,
+				4B079F872155783F00CBFACC /* uBlueCastInterface.h */,
+				4B079F892155784000CBFACC /* uBlueController.h */,
+				4B079F8B2155784000CBFACC /* uBlueDevice.h */,
+				4B079F862155783F00CBFACC /* uBlueGatt.h */,
+				4B079F822155783F00CBFACC /* uBlueGattCharacteristic.h */,
+				4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */,
+				4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */,
+				4B079F842155783F00CBFACC /* uBlueGattService.h */,
+				4B079F832155783F00CBFACC /* uBluePowerState.h */,
+				4B079F852155783F00CBFACC /* uBlueScanResult.h */,
+				4B079F8E2155784000CBFACC /* uBlueViewCallback.h */,
+				4B079F8A2155784000CBFACC /* uBlueViewController.h */,
+			);
+			path = Superglue;
+			sourceTree = "<group>";
+		};
+		4B69690F21562781009CDD3E /* Gatt */ = {
+			isa = PBXGroup;
+			children = (
+				4B696912215627A1009CDD3E /* GattBind.swift */,
+				4B6969142156295A009CDD3E /* GattCharacteristic.swift */,
+				4B6969162156324B009CDD3E /* GattService.swift */,
+				4B696918215632AE009CDD3E /* GattDescriptor.swift */,
+			);
+			path = Gatt;
+			sourceTree = "<group>";
+		};
+		4BE0A89321554D0400F9C402 = {
+			isa = PBXGroup;
+			children = (
+				4BE0A89F21554D0400F9C402 /* Bluecast */,
+				4BE0A89E21554D0400F9C402 /* Products */,
+				4BE0A8A821554D6600F9C402 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		4BE0A89E21554D0400F9C402 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4BE0A89D21554D0400F9C402 /* Bluecast.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4BE0A89F21554D0400F9C402 /* Bluecast */ = {
+			isa = PBXGroup;
+			children = (
+				4B079F80215577AF00CBFACC /* Superglue */,
+				4B69690F21562781009CDD3E /* Gatt */,
+				4B079F9D21557CC800CBFACC /* uBlueController.swift */,
+				4BE0A8A021554D0400F9C402 /* Bluecast.h */,
+				4BE0A8B521554FB300F9C402 /* Bluecast.swift */,
+				4BE0A8A121554D0400F9C402 /* Info.plist */,
+			);
+			path = Bluecast;
+			sourceTree = "<group>";
+		};
+		4BE0A8A821554D6600F9C402 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4B079FAF2155929100CBFACC /* libc++.tbd */,
+				4B079F9F215591DF00CBFACC /* libkitty-err.a */,
+				4B079FA0215591DF00CBFACC /* libkitty-file.a */,
+				4B079FA3215591E000CBFACC /* libkitty-log.a */,
+				4B079FA5215591E000CBFACC /* libkitty-server.a */,
+				4B079FA2215591E000CBFACC /* libkitty-ssl.a */,
+				4B079FA1215591DF00CBFACC /* libkitty-utils.a */,
+				4B079FA6215591E000CBFACC /* libsuperglue.a */,
+				4B079FA4215591E000CBFACC /* libsuperglueC.a */,
+				4BE0A8A921554D6700F9C402 /* Common.xcodeproj */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4BE0A8AA21554D6700F9C402 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4BE0A8AF21554D6700F9C402 /* Common.framework */,
+				4BE0A8B121554D6700F9C402 /* CommonTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4BE0A89A21554D0400F9C402 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B079F972155784000CBFACC /* uBlueController.h in Headers */,
+				4B079F932155784000CBFACC /* uBlueScanResult.h in Headers */,
+				4B079F9C2155784000CBFACC /* uBlueViewCallback.h in Headers */,
+				4B079F9A2155784000CBFACC /* uBlueGattConnectionState.h in Headers */,
+				4B079F982155784000CBFACC /* uBlueViewController.h in Headers */,
+				4BE0A8A221554D0400F9C402 /* Bluecast.h in Headers */,
+				4B079F942155784000CBFACC /* uBlueGatt.h in Headers */,
+				4B079F952155784000CBFACC /* uBlueCastInterface.h in Headers */,
+				4B079F902155784000CBFACC /* uBlueGattCharacteristic.h in Headers */,
+				4B079F912155784000CBFACC /* uBluePowerState.h in Headers */,
+				4B079F992155784000CBFACC /* uBlueDevice.h in Headers */,
+				4B079F962155784000CBFACC /* uBlueBeacon.h in Headers */,
+				4B079F8F2155784000CBFACC /* uBlueCallback.h in Headers */,
+				4B079F922155784000CBFACC /* uBlueGattService.h in Headers */,
+				4B079F9B2155784000CBFACC /* uBlueGattDescriptor.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4BE0A89C21554D0400F9C402 /* Bluecast */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BE0A8A521554D0400F9C402 /* Build configuration list for PBXNativeTarget "Bluecast" */;
+			buildPhases = (
+				4BE0A89821554D0400F9C402 /* Sources */,
+				4BE0A89921554D0400F9C402 /* Frameworks */,
+				4BE0A89A21554D0400F9C402 /* Headers */,
+				4BE0A89B21554D0400F9C402 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Bluecast;
+			productName = Bluecast;
+			productReference = 4BE0A89D21554D0400F9C402 /* Bluecast.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4BE0A89421554D0400F9C402 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Loki;
+				TargetAttributes = {
+					4BE0A89C21554D0400F9C402 = {
+						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 0940;
+					};
+				};
+			};
+			buildConfigurationList = 4BE0A89721554D0400F9C402 /* Build configuration list for PBXProject "Bluecast" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4BE0A89321554D0400F9C402;
+			productRefGroup = 4BE0A89E21554D0400F9C402 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 4BE0A8AA21554D6700F9C402 /* Products */;
+					ProjectRef = 4BE0A8A921554D6700F9C402 /* Common.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				4BE0A89C21554D0400F9C402 /* Bluecast */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		4BE0A8AF21554D6700F9C402 /* Common.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Common.framework;
+			remoteRef = 4BE0A8AE21554D6700F9C402 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4BE0A8B121554D6700F9C402 /* CommonTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = CommonTests.xctest;
+			remoteRef = 4BE0A8B021554D6700F9C402 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4BE0A89B21554D0400F9C402 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4BE0A89821554D0400F9C402 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B696919215632AE009CDD3E /* GattDescriptor.swift in Sources */,
+				4B6969152156295A009CDD3E /* GattCharacteristic.swift in Sources */,
+				4B6969172156324B009CDD3E /* GattService.swift in Sources */,
+				4BE0A8B621554FB300F9C402 /* Bluecast.swift in Sources */,
+				4B696913215627A1009CDD3E /* GattBind.swift in Sources */,
+				4B079F9E21557CC800CBFACC /* uBlueController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4BE0A8A321554D0400F9C402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		4BE0A8A421554D0400F9C402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		4BE0A8A621554D0400F9C402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = Bluecast/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../../libs";
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = Loki.Bluecast;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4BE0A8A721554D0400F9C402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = Bluecast/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../../libs";
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = Loki.Bluecast;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4BE0A89721554D0400F9C402 /* Build configuration list for PBXProject "Bluecast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BE0A8A321554D0400F9C402 /* Debug */,
+				4BE0A8A421554D0400F9C402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BE0A8A521554D0400F9C402 /* Build configuration list for PBXNativeTarget "Bluecast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BE0A8A621554D0400F9C402 /* Debug */,
+				4BE0A8A721554D0400F9C402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4BE0A89421554D0400F9C402 /* Project object */;
+}

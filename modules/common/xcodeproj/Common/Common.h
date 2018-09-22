@@ -8,12 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-#import <Common/LogImpl.h>
-#import <Common/FileImpl.h>
-#import <Common/ThreadImpl.h>
+#import <Common/uLogInterface.h>
+#import <Common/uFileInterface.h>
+#import <Common/uCommonInterface.h>
 
-@interface SuperGlueCommon : NSObject
-
-+ (void) init;
-
-@end
+#import <Common/uPermissionCallback.h>
+#import <Common/uPermissionInterface.h>
+#import <Common/uThreadCallback.h>
+#import <Common/uThreadInterface.h>

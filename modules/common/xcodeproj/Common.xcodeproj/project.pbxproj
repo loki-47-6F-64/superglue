@@ -7,16 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C46621F1B1DCE9000DEF8CE /* FileImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C4662171B1DCE9000DEF8CE /* FileImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C4662201B1DCE9000DEF8CE /* FileImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C4662181B1DCE9000DEF8CE /* FileImpl.mm */; };
-		2C4662211B1DCE9000DEF8CE /* LogImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C4662191B1DCE9000DEF8CE /* LogImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C4662221B1DCE9000DEF8CE /* LogImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C46621A1B1DCE9000DEF8CE /* LogImpl.mm */; };
-		2C4662241B1DCE9000DEF8CE /* superglue_common.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C46621C1B1DCE9000DEF8CE /* superglue_common.mm */; };
-		2C4662251B1DCE9000DEF8CE /* ThreadImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C46621D1B1DCE9000DEF8CE /* ThreadImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C4662261B1DCE9000DEF8CE /* ThreadImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C46621E1B1DCE9000DEF8CE /* ThreadImpl.mm */; };
 		2CA13ECD1B1CA645007937A3 /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA13ECC1B1CA645007937A3 /* Common.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CA13ED31B1CA645007937A3 /* Common.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA13EC71B1CA645007937A3 /* Common.framework */; };
 		2CA13EDA1B1CA645007937A3 /* CommonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CA13ED91B1CA645007937A3 /* CommonTests.m */; };
+		4B079F7321555F7E00CBFACC /* FileImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F7221555F7E00CBFACC /* FileImpl.swift */; };
+		4B079F752155697800CBFACC /* SuperglueCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F742155697800CBFACC /* SuperglueCommon.swift */; };
+		4B079F7721556D0100CBFACC /* ThreadImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F7621556D0100CBFACC /* ThreadImpl.swift */; };
+		4B079F79215571AB00CBFACC /* LogImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F78215571AB00CBFACC /* LogImpl.swift */; };
+		4B079F7D2155760D00CBFACC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EEC211CAF3300F4B241 /* libc++.tbd */; };
 		4BB13EE1211CAE5700F4B241 /* libkitty-err.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED7211CAE5600F4B241 /* libkitty-err.a */; };
 		4BB13EE2211CAE5700F4B241 /* libkitty-file.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED8211CAE5600F4B241 /* libkitty-file.a */; };
 		4BB13EE3211CAE5700F4B241 /* libkitty-utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED9211CAE5600F4B241 /* libkitty-utils.a */; };
@@ -25,6 +23,16 @@
 		4BB13EE6211CAE5700F4B241 /* libsuperglueC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDC211CAE5700F4B241 /* libsuperglueC.a */; };
 		4BB13EE8211CAE5700F4B241 /* libkitty-server.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EDE211CAE5700F4B241 /* libkitty-server.a */; };
 		4BB13EEA211CAE5700F4B241 /* libsuperglue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EE0211CAE5700F4B241 /* libsuperglue.a */; };
+		4BE0A92321555BB000F9C402 /* uLogInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A91D21555BB000F9C402 /* uLogInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92421555BB000F9C402 /* uFileInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A91E21555BB000F9C402 /* uFileInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92521555BB000F9C402 /* uLogSeverity.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A91F21555BB000F9C402 /* uLogSeverity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92621555BB000F9C402 /* uCommonInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92021555BB000F9C402 /* uCommonInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92721555BB000F9C402 /* uPermission.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92121555BB000F9C402 /* uPermission.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92821555BB000F9C402 /* uPermissionCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92221555BB000F9C402 /* uPermissionCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92C21555C0C00F9C402 /* uThreadCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92921555C0C00F9C402 /* uThreadCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92D21555C0C00F9C402 /* uPermissionInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92A21555C0C00F9C402 /* uPermissionInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A92E21555C0C00F9C402 /* uThreadInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A92B21555C0C00F9C402 /* uThreadInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE0A93021555C9500F9C402 /* PermImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0A92F21555C9500F9C402 /* PermImpl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,19 +46,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2C4662171B1DCE9000DEF8CE /* FileImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileImpl.h; sourceTree = "<group>"; };
-		2C4662181B1DCE9000DEF8CE /* FileImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FileImpl.mm; sourceTree = "<group>"; };
-		2C4662191B1DCE9000DEF8CE /* LogImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogImpl.h; sourceTree = "<group>"; };
-		2C46621A1B1DCE9000DEF8CE /* LogImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LogImpl.mm; sourceTree = "<group>"; };
-		2C46621C1B1DCE9000DEF8CE /* superglue_common.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = superglue_common.mm; sourceTree = "<group>"; };
-		2C46621D1B1DCE9000DEF8CE /* ThreadImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadImpl.h; sourceTree = "<group>"; };
-		2C46621E1B1DCE9000DEF8CE /* ThreadImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ThreadImpl.mm; sourceTree = "<group>"; };
 		2CA13EC71B1CA645007937A3 /* Common.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Common.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA13ECB1B1CA645007937A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2CA13ECC1B1CA645007937A3 /* Common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
 		2CA13ED21B1CA645007937A3 /* CommonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CommonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA13ED81B1CA645007937A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2CA13ED91B1CA645007937A3 /* CommonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommonTests.m; sourceTree = "<group>"; };
+		4B079F7221555F7E00CBFACC /* FileImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FileImpl.swift; path = ../FileImpl.swift; sourceTree = "<group>"; };
+		4B079F742155697800CBFACC /* SuperglueCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperglueCommon.swift; sourceTree = "<group>"; };
+		4B079F7621556D0100CBFACC /* ThreadImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadImpl.swift; sourceTree = "<group>"; };
+		4B079F78215571AB00CBFACC /* LogImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogImpl.swift; sourceTree = "<group>"; };
 		4BB13ED5211CAE4200F4B241 /* libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libs; path = ../../../libs; sourceTree = "<group>"; };
 		4BB13ED7211CAE5600F4B241 /* libkitty-err.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-err.a"; path = "../../libs/libkitty-err.a"; sourceTree = "<group>"; };
 		4BB13ED8211CAE5600F4B241 /* libkitty-file.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-file.a"; path = "../../libs/libkitty-file.a"; sourceTree = "<group>"; };
@@ -58,11 +63,19 @@
 		4BB13EDA211CAE5700F4B241 /* libkitty-ssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-ssl.a"; path = "../../libs/libkitty-ssl.a"; sourceTree = "<group>"; };
 		4BB13EDB211CAE5700F4B241 /* libkitty-log.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-log.a"; path = "../../libs/libkitty-log.a"; sourceTree = "<group>"; };
 		4BB13EDC211CAE5700F4B241 /* libsuperglueC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglueC.a; path = ../../libs/libsuperglueC.a; sourceTree = "<group>"; };
-		4BB13EDD211CAE5700F4B241 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../../libs/libcrypto.a; sourceTree = "<group>"; };
 		4BB13EDE211CAE5700F4B241 /* libkitty-server.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-server.a"; path = "../../libs/libkitty-server.a"; sourceTree = "<group>"; };
-		4BB13EDF211CAE5700F4B241 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../../libs/libssl.a; sourceTree = "<group>"; };
 		4BB13EE0211CAE5700F4B241 /* libsuperglue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglue.a; path = ../../libs/libsuperglue.a; sourceTree = "<group>"; };
 		4BB13EEC211CAF3300F4B241 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		4BE0A91D21555BB000F9C402 /* uLogInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uLogInterface.h; path = ../../../../include/uLogInterface.h; sourceTree = "<group>"; };
+		4BE0A91E21555BB000F9C402 /* uFileInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uFileInterface.h; path = ../../../../include/uFileInterface.h; sourceTree = "<group>"; };
+		4BE0A91F21555BB000F9C402 /* uLogSeverity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uLogSeverity.h; path = ../../../../include/uLogSeverity.h; sourceTree = "<group>"; };
+		4BE0A92021555BB000F9C402 /* uCommonInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uCommonInterface.h; path = ../../../../include/uCommonInterface.h; sourceTree = "<group>"; };
+		4BE0A92121555BB000F9C402 /* uPermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uPermission.h; path = ../../../../include/uPermission.h; sourceTree = "<group>"; };
+		4BE0A92221555BB000F9C402 /* uPermissionCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uPermissionCallback.h; path = ../../../../include/uPermissionCallback.h; sourceTree = "<group>"; };
+		4BE0A92921555C0C00F9C402 /* uThreadCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uThreadCallback.h; path = ../../../../include/uThreadCallback.h; sourceTree = "<group>"; };
+		4BE0A92A21555C0C00F9C402 /* uPermissionInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uPermissionInterface.h; path = ../../../../include/uPermissionInterface.h; sourceTree = "<group>"; };
+		4BE0A92B21555C0C00F9C402 /* uThreadInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uThreadInterface.h; path = ../../../../include/uThreadInterface.h; sourceTree = "<group>"; };
+		4BE0A92F21555C9500F9C402 /* PermImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermImpl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B079F7D2155760D00CBFACC /* libc++.tbd in Frameworks */,
 				4BB13EE1211CAE5700F4B241 /* libkitty-err.a in Frameworks */,
 				4BB13EE2211CAE5700F4B241 /* libkitty-file.a in Frameworks */,
 				4BB13EE3211CAE5700F4B241 /* libkitty-utils.a in Frameworks */,
@@ -114,25 +128,16 @@
 		2CA13EC91B1CA645007937A3 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				2C4662171B1DCE9000DEF8CE /* FileImpl.h */,
-				2C4662181B1DCE9000DEF8CE /* FileImpl.mm */,
-				2C4662191B1DCE9000DEF8CE /* LogImpl.h */,
-				2C46621A1B1DCE9000DEF8CE /* LogImpl.mm */,
-				2C46621C1B1DCE9000DEF8CE /* superglue_common.mm */,
-				2C46621D1B1DCE9000DEF8CE /* ThreadImpl.h */,
-				2C46621E1B1DCE9000DEF8CE /* ThreadImpl.mm */,
+				4BE0A8EB21555A1100F9C402 /* Superglue */,
+				4B079F7221555F7E00CBFACC /* FileImpl.swift */,
 				2CA13ECC1B1CA645007937A3 /* Common.h */,
-				2CA13ECA1B1CA645007937A3 /* Supporting Files */,
+				4BE0A92F21555C9500F9C402 /* PermImpl.swift */,
+				2CA13ECB1B1CA645007937A3 /* Info.plist */,
+				4B079F7621556D0100CBFACC /* ThreadImpl.swift */,
+				4B079F78215571AB00CBFACC /* LogImpl.swift */,
+				4B079F742155697800CBFACC /* SuperglueCommon.swift */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		2CA13ECA1B1CA645007937A3 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				2CA13ECB1B1CA645007937A3 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		2CA13ED61B1CA645007937A3 /* CommonTests */ = {
@@ -156,19 +161,33 @@
 			isa = PBXGroup;
 			children = (
 				4BB13EEC211CAF3300F4B241 /* libc++.tbd */,
-				4BB13EDD211CAE5700F4B241 /* libcrypto.a */,
 				4BB13ED7211CAE5600F4B241 /* libkitty-err.a */,
 				4BB13ED8211CAE5600F4B241 /* libkitty-file.a */,
 				4BB13EDB211CAE5700F4B241 /* libkitty-log.a */,
 				4BB13EDE211CAE5700F4B241 /* libkitty-server.a */,
 				4BB13EDA211CAE5700F4B241 /* libkitty-ssl.a */,
 				4BB13ED9211CAE5600F4B241 /* libkitty-utils.a */,
-				4BB13EDF211CAE5700F4B241 /* libssl.a */,
 				4BB13EE0211CAE5700F4B241 /* libsuperglue.a */,
 				4BB13EDC211CAE5700F4B241 /* libsuperglueC.a */,
 				4BB13ED5211CAE4200F4B241 /* libs */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4BE0A8EB21555A1100F9C402 /* Superglue */ = {
+			isa = PBXGroup;
+			children = (
+				4BE0A92A21555C0C00F9C402 /* uPermissionInterface.h */,
+				4BE0A92921555C0C00F9C402 /* uThreadCallback.h */,
+				4BE0A92B21555C0C00F9C402 /* uThreadInterface.h */,
+				4BE0A92021555BB000F9C402 /* uCommonInterface.h */,
+				4BE0A91E21555BB000F9C402 /* uFileInterface.h */,
+				4BE0A91D21555BB000F9C402 /* uLogInterface.h */,
+				4BE0A91F21555BB000F9C402 /* uLogSeverity.h */,
+				4BE0A92121555BB000F9C402 /* uPermission.h */,
+				4BE0A92221555BB000F9C402 /* uPermissionCallback.h */,
+			);
+			path = Superglue;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,10 +197,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C4662251B1DCE9000DEF8CE /* ThreadImpl.h in Headers */,
-				2C46621F1B1DCE9000DEF8CE /* FileImpl.h in Headers */,
 				2CA13ECD1B1CA645007937A3 /* Common.h in Headers */,
-				2C4662211B1DCE9000DEF8CE /* LogImpl.h in Headers */,
+				4BE0A92821555BB000F9C402 /* uPermissionCallback.h in Headers */,
+				4BE0A92621555BB000F9C402 /* uCommonInterface.h in Headers */,
+				4BE0A92421555BB000F9C402 /* uFileInterface.h in Headers */,
+				4BE0A92E21555C0C00F9C402 /* uThreadInterface.h in Headers */,
+				4BE0A92721555BB000F9C402 /* uPermission.h in Headers */,
+				4BE0A92C21555C0C00F9C402 /* uThreadCallback.h in Headers */,
+				4BE0A92D21555C0C00F9C402 /* uPermissionInterface.h in Headers */,
+				4BE0A92321555BB000F9C402 /* uLogInterface.h in Headers */,
+				4BE0A92521555BB000F9C402 /* uLogSeverity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +260,7 @@
 				TargetAttributes = {
 					2CA13EC61B1CA645007937A3 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 0940;
 					};
 					2CA13ED11B1CA645007937A3 = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -281,10 +307,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C4662221B1DCE9000DEF8CE /* LogImpl.mm in Sources */,
-				2C4662201B1DCE9000DEF8CE /* FileImpl.mm in Sources */,
-				2C4662241B1DCE9000DEF8CE /* superglue_common.mm in Sources */,
-				2C4662261B1DCE9000DEF8CE /* ThreadImpl.mm in Sources */,
+				4B079F7721556D0100CBFACC /* ThreadImpl.swift in Sources */,
+				4B079F79215571AB00CBFACC /* LogImpl.swift in Sources */,
+				4B079F7321555F7E00CBFACC /* FileImpl.swift in Sources */,
+				4B079F752155697800CBFACC /* SuperglueCommon.swift in Sources */,
+				4BE0A93021555C9500F9C402 /* PermImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +428,7 @@
 					arm64,
 				);
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -408,7 +436,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/../../include/**",
 				);
 				INFOPLIST_FILE = Common/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -421,9 +448,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../libs",
 				);
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -435,6 +464,7 @@
 					arm64,
 				);
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -442,7 +472,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/../../include/**",
 				);
 				INFOPLIST_FILE = Common/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -455,15 +484,17 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../libs",
 				);
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
 		2CA13EE11B1CA645007937A3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -485,6 +516,7 @@
 		2CA13EE21B1CA645007937A3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
