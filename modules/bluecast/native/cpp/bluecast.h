@@ -10,32 +10,24 @@
 #include <blue_cast_interface.hpp>
 
 #include <blue_callback.hpp>
-#include <blue_view_callback.hpp>
+#include <blue_view_main_callback.hpp>
 
 #include <blue_power_state.hpp>
 #include <blue_beacon.hpp>
 
+#include <permission.hpp>
+
 #include <kitty/util/task_pool.h>
+#include <kitty/util/auto_run.h>
+
+#include "thread_t.hpp"
+
+#define TASK(x,y) ::bluecast::tasks().push([x] () { y; })
+
 namespace bluecast {
 
-class BlueViewCallback : public gen::BlueViewCallback {
-  std::shared_ptr<gen::BlueViewController> _blue_view_controller;
-
-  bool _scan_enabled;
-public:
-  const std::shared_ptr<gen::BlueViewController> &get_blue_view_controller() const { return _blue_view_controller; }
-  bool scan_enabled() const { return _scan_enabled; }
-
-  BlueViewCallback() = delete;
-  explicit BlueViewCallback(const std::shared_ptr<gen::BlueViewController> &view_controller) : _blue_view_controller(view_controller), _scan_enabled(false) {}
-
-  void on_power_state_change(gen::BluePowerState new_state) override;
-
-  void on_toggle_scan(bool scan) override;
-
-  void on_select_device(const gen::BlueDevice &dev) override;
-};
-
+class BlueViewMainCallback;
+class BlueViewDisplayCallback;
 
 class BlueCallback : public gen::BlueCallback {
   struct beacon_t {
@@ -43,7 +35,8 @@ class BlueCallback : public gen::BlueCallback {
     util::TaskPool::task_id_t beacon_timeout_id;
   };
 
-  std::shared_ptr<BlueViewCallback> _blue_view_callback;
+  std::shared_ptr<BlueViewMainCallback> _blue_view_main_callback;
+  std::shared_ptr<BlueViewDisplayCallback> _blue_view_display_callback;
 
   // The util::TaskPool::task_id_t is necessary for the beacon timeout
   std::map<std::string, beacon_t> _blue_beacons;
@@ -57,14 +50,23 @@ public:
 
   void on_beacon_update(const gen::BlueBeacon &beacon) override;
 
-  std::shared_ptr<gen::BlueViewCallback> on_create(const std::shared_ptr<gen::BlueViewController> &blue_view,
-                                                   const std::shared_ptr<gen::PermissionInterface> &permission_manager) override;
+  std::shared_ptr<gen::BlueViewMainCallback> on_create_main(
+    const std::shared_ptr<gen::BlueViewMainController> &blue_view,
+    const std::shared_ptr<gen::PermissionInterface> &permission_manager) override;
 
-  void on_destroy() override;
+  void on_destroy_main() override;
 
+  std::shared_ptr<gen::BlueViewDisplayCallback> on_create_display(const gen::BlueDevice& device, const std::shared_ptr<gen::BlueViewDisplayController> &blue_view) override;
+
+  void on_destroy_display() override;
 
   ~BlueCallback() override;
 };
 
+util::TaskPool &tasks();
+std::shared_ptr<gen::BlueController> &blueManager();
+
+void log(gen::LogSeverity severity, const std::string &message);
+void request_permission(gen::Permission perm, const std::shared_ptr<gen::PermissionInterface> &permission_manager);
 }
 #endif //SUPERGLUE_BLUECAST_H
