@@ -11,15 +11,18 @@ import CoreBluetooth
 import CoreLocation
 
 public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeripheralDelegate, CLLocationManagerDelegate {
+    
     var centralManager : CBCentralManager?
+    
     let locationManager = CLLocationManager()
+    let region = CLBeaconRegion(proximityUUID: UUID.init(uuidString: "ffebb31d-ae63-4c4f-bc76-4658073cf483")!, identifier: "uniqueID")
     
     public var blueCallback : uBlueCallback?
-    public var blueView : uBlueViewCallback?
+    public var blueView : uBlueViewMainCallback?
     
     // Only works for single connectections
     //TODO: Use dictionary
-    var serviceCount = 0
+    var serviceCount : [UUID : Int] = [:]
     public override init() {
         super.init()
         
@@ -27,13 +30,10 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
         
         blueCallback = uBlueCastInterface.config(self)
         locationManager.delegate = self
-        if CLLocationManager.authorizationStatus() != CLAuthorizationStatus.notDetermined {
- //           locationManager.startRangingBeacons(in: CLBeaconRegion())
-        }
     }
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        blueView.map { $0.onPowerStateChange(Bluetooth.fromState(newState: central.state)) }
+        blueCallback?.onBluePowerStateChange(Bluetooth.fromState(newState: central.state))
     }
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
@@ -43,15 +43,12 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
         blueCallback?.onScanResult(
             uBlueScanResult.init(
                 dev: uBlueDevice.init(name: name, address: addr),
-                advertisingSid: nil,
-                txPower: nil,
-                rssi: Int32(truncating:RSSI),
-                dataComplete: true,
-                connectable: true))
+                rssi: Int32(truncating:RSSI))
+        )
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        serviceCount = peripheral.services!.count
+        serviceCount[peripheral.identifier] = peripheral.services!.count
         
         for service in peripheral.services! {
             peripheral.discoverCharacteristics(nil, for: service)
@@ -59,8 +56,8 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        serviceCount -= 1
-        if(serviceCount == 0) {
+        serviceCount[peripheral.identifier]! -= 1
+        if(serviceCount[peripheral.identifier] == 0) {
             blueCallback?.onGattServicesDiscovered(GattBind.init(central: centralManager!, peripheral: peripheral), result: true)
         }
     }
@@ -85,7 +82,16 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
         centralManager?.connect(peripheral, options: nil)
     }
     
-    public func scan(_ enable: Bool) {
+    public func beaconScan(_ enable: Bool) {
+        if(enable) {
+            locationManager.startRangingBeacons(in: region)
+        }
+        else {
+            locationManager.stopRangingBeacons(in: region)
+        }
+    }
+    
+    public func peripheralScan(_ enable: Bool) {
         if(enable) {
             centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -100,23 +106,21 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
     
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
         for beacon in beacons {
-            blueCallback?.onBeaconUpdate(
-                uBlueBeacon(device: uBlueDevice(name: nil, address: "dummy-addr"),
+            blueCallback?.onBeaconUpdate(uBlueBeacon(
                 uuid: beacon.proximityUUID.uuidString,
                 major: Int32(truncating: beacon.major),
                 minor: Int32(truncating: beacon.minor),
-                distance: beacon.accuracy.advanced(by: 0.0)))
+                distance: beacon.accuracy.advanced(by: 0.0))
+            )
         }
     }
     
     private static func fromState(newState : CBManagerState) -> uBluePowerState {
         switch newState {
-        case .poweredOff, .unauthorized, .unsupported, .unknown:
+        case .poweredOff, .unauthorized, .unsupported, .unknown, .resetting:
             return uBluePowerState.off
         case .poweredOn:
             return uBluePowerState.on
-        case .resetting:
-            return uBluePowerState.turningOn
         }
     }
 }

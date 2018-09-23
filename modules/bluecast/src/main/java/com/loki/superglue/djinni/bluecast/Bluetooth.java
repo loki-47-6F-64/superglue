@@ -81,7 +81,7 @@ public class Bluetooth extends BluetoothGattCallback {
             }
 
             @Override
-            public void scan(boolean enable) {
+            public void peripheralScan(boolean enable) {
                 BluetoothLeScanner bleScanner = btAdap.getBluetoothLeScanner();
 
                 if(enable) {
@@ -104,39 +104,13 @@ public class Bluetooth extends BluetoothGattCallback {
         };
     }
 
-    private BlueScanResult fromScanResult_old(ScanResult res) {
-        BluetoothDevice dev = res.getDevice();
-
-        return new BlueScanResult(
-                new BlueDevice(dev.getName(), dev.getAddress()),
-                null,
-                null,
-                res.getRssi(),
-                true,
-                true
-        );
-    }
-
-    @TargetApi(26)
-    private BlueScanResult fromScanResult_modern(ScanResult res) {
-        BluetoothDevice dev = res.getDevice();
-
-        return new BlueScanResult(
-                new BlueDevice(dev.getName(), dev.getAddress()),
-                res.getAdvertisingSid() != ScanResult.SID_NOT_PRESENT ? res.getTxPower() : null,
-                res.getTxPower() != ScanResult.TX_POWER_NOT_PRESENT ? res.getTxPower() : null,
-                res.getRssi(),
-                res.getDataStatus() == ScanResult.DATA_COMPLETE,
-                res.isConnectable()
-        );
-    }
-
     private BlueScanResult fromScanResult(ScanResult res) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return fromScanResult_modern(res);
-        }
+        BluetoothDevice dev = res.getDevice();
 
-        return fromScanResult_old(res);
+        return new BlueScanResult(
+                new BlueDevice(dev.getName(), dev.getAddress()),
+                res.getRssi()
+        );
     }
 
     private ScanCallback scanCallback() {
@@ -152,15 +126,13 @@ public class Bluetooth extends BluetoothGattCallback {
 
     private static BlueGattConnectionState fromGattState(int newState) {
         switch (newState) {
-            case BluetoothGatt.STATE_DISCONNECTED:
+            case BluetoothGatt.STATE_DISCONNECTING:
                 return BlueGattConnectionState.DISCONNECTED;
-            case BluetoothGatt.STATE_CONNECTING:
-                return BlueGattConnectionState.CONNECTING;
             case BluetoothGatt.STATE_CONNECTED:
                 return BlueGattConnectionState.CONNECTED;
         }
 
-        return BlueGattConnectionState.DISCONNECTING;
+        return BlueGattConnectionState.DISCONNECTED;
     }
 
     @Override
@@ -191,7 +163,6 @@ public class Bluetooth extends BluetoothGattCallback {
 
                             BluetoothDevice device = btAdap.getRemoteDevice(beacon.getBluetoothAddress());
                             blCall.onBeaconUpdate(new BlueBeacon(
-                                    new BlueDevice(device.getName(), device.getAddress()),
                                     uuid.toString(),
                                     major,
                                     minor,
@@ -234,12 +205,10 @@ public class Bluetooth extends BluetoothGattCallback {
         switch (state) {
             case BluetoothAdapter.STATE_OFF:
                 return BluePowerState.OFF;
-            case BluetoothAdapter.STATE_TURNING_OFF:
-                return BluePowerState.TURNING_OFF;
             case BluetoothAdapter.STATE_ON:
                 return BluePowerState.ON;
-            default:
-                return BluePowerState.TURNING_ON;
         }
+
+        return BluePowerState.OFF;
     }
 }

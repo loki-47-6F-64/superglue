@@ -39,14 +39,9 @@ class Optional {
       }
     }
     
-    // Swap objects
     object & operator = (object &&other) {
       if(other.constructed()) {
-        if(constructed()) {
-          get() = std::move(other.get());
-        } else {
-          _obj_p = new (_obj) obj_t(std::move(other.get()));
-        }
+          *this = std::move(other.get());
       }
       else if(constructed()) {
         _obj_p->~obj_t();
@@ -59,11 +54,7 @@ class Optional {
     // copy objects
     object & operator = (const object &other) {
       if(other.constructed()) {
-        if(constructed()) {
-          get() = other.get();
-        } else {
-          _obj_p = new (_obj) obj_t(other.get());
-        }
+        return (*this = other.get());
       }
       else if(constructed()) {
         _obj_p->~obj_t();
@@ -73,6 +64,27 @@ class Optional {
       return *this;
     }
 
+    object & operator = (obj_t &&obj) {
+        if(constructed()) {
+            get() = std::move(obj); return *this;
+        }
+      
+        _obj_p = new (_obj) obj_t(std::move(obj));
+        
+        return *this;
+    }
+      
+    object & operator = (const obj_t &obj) {
+      if(constructed()) {
+        get() = obj; return *this;
+      }
+        
+      _obj_p = new (_obj) obj_t(std::move(obj));
+        
+        return *this;
+    }
+      
+    
     ~object() {
       if(constructed()) {
         get().~obj_t();

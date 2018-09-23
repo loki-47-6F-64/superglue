@@ -35,12 +35,15 @@ class BlueCallback : public gen::BlueCallback {
     util::TaskPool::task_id_t beacon_timeout_id;
   };
 
+  util::Optional<util::TaskPool::task_id_t> _peripheral_scan_task_id;
+    
   std::shared_ptr<BlueViewMainCallback> _blue_view_main_callback;
   std::shared_ptr<BlueViewDisplayCallback> _blue_view_display_callback;
 
   // The util::TaskPool::task_id_t is necessary for the beacon timeout
   std::map<std::string, beacon_t> _blue_beacons;
 public:
+  void on_blue_power_state_change(gen::BluePowerState blueState) override;
   void on_scan_result(const gen::BlueScanResult &scan) override;
 
   void on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) override;

@@ -1,15 +1,11 @@
 blue_power_state = enum {
   off;
-  turning_off;
   on;
-  turning_on;
 }
 
 blue_gatt_connection_state = enum {
-    connected;
-    connecting;
-    disconnected;
-    disconnecting;
+  connected;
+  disconnected;
 }
 
 blue_device = record {
@@ -18,18 +14,11 @@ blue_device = record {
 } deriving(eq)
 
 blue_scan_result = record {
-  dev : blue_device;
-  advertising_sid : optional<i32>;
-  tx_power : optional<i32>;
+  dev  : blue_device;
   rssi : i32;
-
-  data_complete : bool;
-  connectable : bool;
 }
 
 blue_beacon = record {
-  device : blue_device;
-
   uuid : string;
   major : i32;
   minor : i32;
@@ -54,7 +43,6 @@ blue_gatt_service = interface {
 }
 
 blue_gatt = interface {
-  close();
   disconnect();
   discover_services() : bool;
 
@@ -63,8 +51,6 @@ blue_gatt = interface {
 }
 
 blue_view_main_callback = interface +c {
-  on_power_state_change(new_state : blue_power_state);
-
   on_toggle_scan(scan : bool);
   on_select_device(dev : blue_device);
 }
@@ -74,6 +60,8 @@ blue_view_display_callback = interface +c {
 }
 
 blue_callback = interface +c {
+  on_blue_power_state_change(new_state : blue_power_state);
+  
   on_scan_result(scan : blue_scan_result);
 
   on_gatt_services_discovered(gatt : blue_gatt, result : bool);
@@ -102,7 +90,7 @@ blue_view_main_controller = interface +j +o {
   blue_enable(enable : bool);
 
   beacon_list_update(beacon : blue_beacon);
-  beacon_list_remove(beacon : blue_device);
+  beacon_list_remove(beacon : blue_beacon);
 
   launch_view_display(device : blue_device);
 }
@@ -117,7 +105,7 @@ blue_view_display_controller = interface +j +o {
 blue_controller = interface +j +o {
   is_enabled() : bool;
 
-  scan(enable : bool);
+  peripheral_scan(enable : bool);
 
   connect_gatt(dev : blue_device);
 

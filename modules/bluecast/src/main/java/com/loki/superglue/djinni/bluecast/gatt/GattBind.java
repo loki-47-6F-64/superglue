@@ -33,11 +33,6 @@ public class GattBind extends BlueGatt {
     }
 
     @Override
-    public void close() {
-        gatt.close();
-    }
-
-    @Override
     public ArrayList<BlueGattService> services() {
         List<BluetoothGattService> gattServicesOut = gatt.getServices();
 

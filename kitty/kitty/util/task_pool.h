@@ -117,6 +117,19 @@ public:
     }
   }
 
+    void cancelTask(task_id_t task_id) {
+      std::lock_guard<std::mutex> lg(_task_mutex);
+        
+      auto it = _timer_tasks.begin();
+      for(; it < _timer_tasks.cend(); ++it) {
+        const __task &task = std::get<1>(*it);
+            
+        if(&*task == task_id) {
+          _timer_tasks.erase(it);
+        }
+      }
+    }
+    
   util::Optional<__task> pop() {
     std::lock_guard<std::mutex> lg(_task_mutex);
     

@@ -177,7 +177,7 @@ public:
 private:
   int _select(const int read) {
     if(_millisec.count() > 0) {
-      suseconds_t dur_micro = std::chrono::duration_cast<std::chrono::microseconds>(_millisec).count();
+      auto dur_micro = (suseconds_t)std::chrono::duration_cast<std::chrono::microseconds>(_millisec).count();
       timeval tv {
         0,
         dur_micro

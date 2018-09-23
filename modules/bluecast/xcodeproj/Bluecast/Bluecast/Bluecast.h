@@ -29,5 +29,7 @@ FOUNDATION_EXPORT const unsigned char BluecastVersionString[];
 #import <Bluecast/uBlueGattService.h>
 #import <Bluecast/uBluePowerState.h>
 #import <Bluecast/uBlueScanResult.h>
-#import <Bluecast/uBlueViewCallback.h>
-#import <Bluecast/uBlueViewController.h>
+#import <Bluecast/uBlueViewMainCallback.h>
+#import <Bluecast/uBlueViewMainController.h>
+#import <Bluecast/uBlueViewDisplayCallback.h>
+#import <Bluecast/uBlueViewDisplayController.h>

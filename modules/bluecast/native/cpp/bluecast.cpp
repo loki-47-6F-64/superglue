@@ -56,20 +56,9 @@ void log(gen::LogSeverity severity, const std::string &message) {
 void log_scan_result(const gen::BlueScanResult &scan) {
   std::stringstream ss;
 
-  ss << std::endl;
-  ss << "data_complete::" << scan.data_complete << std::endl;
-  ss << "connectable::" << scan.connectable << std::endl;
-  if (scan.advertising_sid) {
-    ss << "advertising_sid::" << *scan.advertising_sid << std::endl;
-  }
-
-  if (scan.tx_power) {
-    ss << "tx_power::" << *scan.tx_power << std::endl;
-  }
-
-  ss << "rssi::" << scan.rssi << std::endl;
   ss << "dev::name::" << (scan.dev.name ? *scan.dev.name : "unknown") << std::endl;
   ss << "dev::address::" << scan.dev.address << std::endl;
+  ss << "dev::rssi::" << scan.rssi << std::endl;
 
   log(gen::LogSeverity::DEBUG, ss.str());
 }
@@ -77,18 +66,15 @@ void log_scan_result(const gen::BlueScanResult &scan) {
 void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   log_scan_result(scan);
 
-  tasks().push([this](gen::BlueScanResult &&scan) {
-    auto &dev = scan.dev;
-
-    auto it = _blue_beacons.find(dev.address);
-    if(it != _blue_beacons.end() && it->second.beacon.device.name != dev.name) {
-      it->second.beacon.device = std::move(dev);
-
-      if(_blue_view_main_callback) {
-        _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(it->second.beacon);
-      }
-    }
-  }, util::cmove(const_cast<gen::BlueScanResult&>(scan)));
+  const auto &dev = scan.dev;
+    
+  if(dev.name == "Viking") {
+    tasks().cancelTask(_peripheral_scan_task_id);
+    tasks().push([](const auto &dev, auto blue_view_main_controller) {
+      blueManager()->peripheral_scan(false);
+      blue_view_main_controller->launch_view_display(dev);
+    }, dev, _blue_view_main_callback->get_blue_view_controller());
+  }
 }
 
 void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGatt> &gatt, bool result) {
@@ -123,10 +109,6 @@ void BlueCallback::on_gatt_connection_state_change(const std::shared_ptr<gen::Bl
   }
   else if(new_state == gen::BlueGattConnectionState::DISCONNECTED) {
     log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::DISCONNECTED");
-    TASK(gatt, gatt->close());
-  }
-  else {
-    log(gen::LogSeverity::DEBUG, "on_gatt_connection_result::NOT_CONNECTED");
   }
 }
 
@@ -157,11 +139,7 @@ std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
     if(!_blue_view_main_callback) {
       return;
     }
-
-    if(_blue_view_main_callback->scan_enabled()) {
-      blueManager()->beacon_scan(true);
-    }
-
+      
     auto &control = _blue_view_main_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
       control->beacon_list_update(beacon.second.beacon);
@@ -186,28 +164,40 @@ std::shared_ptr<gen::BlueViewDisplayCallback> BlueCallback::on_create_display(
 
 void BlueCallback::on_destroy_main() {
   log(gen::LogSeverity::DEBUG, "on_destroy_main");
-
-  TASK(this,
-    if(_blue_view_main_callback->scan_enabled()) {
-      blueManager()->beacon_scan(false);
-    }
-
-    _blue_view_main_callback.reset();
-  );
+  _blue_view_main_callback.reset();
 }
 
 void BlueCallback::on_destroy_display() {
   log(gen::LogSeverity::DEBUG, "on_destroy_display");
-  TASK(this, _blue_view_display_callback.reset());
+  TASK(this,
+       _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
+    _blue_view_display_callback.reset()
+  );
 }
 
 void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
+  if(beacon.distance < 1.0) {
+    TASK(this,
+      if(_peripheral_scan_task_id) {
+        return;
+      }
+      
+      blueManager()->peripheral_scan(true);
+      _peripheral_scan_task_id = tasks().pushTimed([this]() {
+        blueManager()->peripheral_scan(false);
+        
+        // Let it be known that the task has been completed
+        _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
+      }, std::chrono::seconds(1)).task_id;
+    );
+  }
+    
   tasks().push([this](gen::BlueBeacon &&beacon) {
     if(_blue_view_main_callback) {
       _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);
     }
 
-    auto it = _blue_beacons.find(beacon.device.address);
+    auto it = _blue_beacons.find(beacon.uuid);
 
     util::TaskPool::task_id_t task_id;
     // If beacon first appears...
@@ -218,8 +208,8 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
           _blue_view_main_callback->get_blue_view_controller()->beacon_list_remove(beacon);
         }
 
-        _blue_beacons.erase(beacon.address);
-      }, std::chrono::seconds(3), beacon.device);
+        _blue_beacons.erase(beacon.uuid);
+      }, std::chrono::seconds(3), beacon);
 
       task_id = delayed_task.task_id;
     }
@@ -228,8 +218,7 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
       tasks().delayTask(task_id, std::chrono::seconds(3));
     }
 
-    std::string address = beacon.device.address;
-    _blue_beacons.emplace(address, beacon_t { std::move(beacon), task_id });
+    _blue_beacons.emplace(beacon.uuid, beacon_t { beacon, task_id });
 
   }, util::const_cmove(beacon));
 }
@@ -247,6 +236,17 @@ void request_permission(gen::Permission perm, const std::shared_ptr<gen::Permiss
     }));
 }
 
+void BlueCallback::on_blue_power_state_change(gen::BluePowerState blueState) {
+  switch(blueState) {
+    case gen::BluePowerState::OFF:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: OFF");
+      break;
+    case gen::BluePowerState::ON:
+      log(gen::LogSeverity::DEBUG, "Bluetooth state: ON");
+      break;
+  }
+}
+    
 /* namespace bluecast */ }
 
 std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::config(

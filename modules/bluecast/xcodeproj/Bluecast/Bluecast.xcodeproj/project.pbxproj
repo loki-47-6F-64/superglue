@@ -16,16 +16,18 @@
 		4B079F952155784000CBFACC /* uBlueCastInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F872155783F00CBFACC /* uBlueCastInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F962155784000CBFACC /* uBlueBeacon.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F882155783F00CBFACC /* uBlueBeacon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F972155784000CBFACC /* uBlueController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F892155784000CBFACC /* uBlueController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4B079F982155784000CBFACC /* uBlueViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8A2155784000CBFACC /* uBlueViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F992155784000CBFACC /* uBlueDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8B2155784000CBFACC /* uBlueDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F9A2155784000CBFACC /* uBlueGattConnectionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F9B2155784000CBFACC /* uBlueGattDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4B079F9C2155784000CBFACC /* uBlueViewCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8E2155784000CBFACC /* uBlueViewCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F9E21557CC800CBFACC /* BlueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F9D21557CC800CBFACC /* BlueController.swift */; };
 		4B696913215627A1009CDD3E /* GattBind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B696912215627A1009CDD3E /* GattBind.swift */; };
 		4B6969152156295A009CDD3E /* GattCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969142156295A009CDD3E /* GattCharacteristic.swift */; };
 		4B6969172156324B009CDD3E /* GattService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969162156324B009CDD3E /* GattService.swift */; };
 		4B696919215632AE009CDD3E /* GattDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B696918215632AE009CDD3E /* GattDescriptor.swift */; };
+		4B6969952157C247009CDD3E /* uBlueViewDisplayCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6969912157C246009CDD3E /* uBlueViewDisplayCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6969962157C247009CDD3E /* uBlueViewDisplayController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6969922157C247009CDD3E /* uBlueViewDisplayController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6969972157C247009CDD3E /* uBlueViewMainCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6969932157C247009CDD3E /* uBlueViewMainCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6969982157C247009CDD3E /* uBlueViewMainController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6969942157C247009CDD3E /* uBlueViewMainController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BE0A8A221554D0400F9C402 /* Bluecast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE0A8A021554D0400F9C402 /* Bluecast.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BE0A8B221554D6F00F9C402 /* Common.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE0A8AF21554D6700F9C402 /* Common.framework */; };
 		4BE0A8B621554FB300F9C402 /* Bluecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0A8B521554FB300F9C402 /* Bluecast.swift */; };
@@ -58,16 +60,18 @@
 		4B079F872155783F00CBFACC /* uBlueCastInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueCastInterface.h; path = ../../../../../include/uBlueCastInterface.h; sourceTree = "<group>"; };
 		4B079F882155783F00CBFACC /* uBlueBeacon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueBeacon.h; path = ../../../../../include/uBlueBeacon.h; sourceTree = "<group>"; };
 		4B079F892155784000CBFACC /* uBlueController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueController.h; path = ../../../../../include/uBlueController.h; sourceTree = "<group>"; };
-		4B079F8A2155784000CBFACC /* uBlueViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewController.h; path = ../../../../../include/uBlueViewController.h; sourceTree = "<group>"; };
 		4B079F8B2155784000CBFACC /* uBlueDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueDevice.h; path = ../../../../../include/uBlueDevice.h; sourceTree = "<group>"; };
 		4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattConnectionState.h; path = ../../../../../include/uBlueGattConnectionState.h; sourceTree = "<group>"; };
 		4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattDescriptor.h; path = ../../../../../include/uBlueGattDescriptor.h; sourceTree = "<group>"; };
-		4B079F8E2155784000CBFACC /* uBlueViewCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewCallback.h; path = ../../../../../include/uBlueViewCallback.h; sourceTree = "<group>"; };
 		4B079F9D21557CC800CBFACC /* BlueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueController.swift; sourceTree = "<group>"; };
 		4B696912215627A1009CDD3E /* GattBind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattBind.swift; sourceTree = "<group>"; };
 		4B6969142156295A009CDD3E /* GattCharacteristic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattCharacteristic.swift; sourceTree = "<group>"; };
 		4B6969162156324B009CDD3E /* GattService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattService.swift; sourceTree = "<group>"; };
 		4B696918215632AE009CDD3E /* GattDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattDescriptor.swift; sourceTree = "<group>"; };
+		4B6969912157C246009CDD3E /* uBlueViewDisplayCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewDisplayCallback.h; path = ../../../../../include/uBlueViewDisplayCallback.h; sourceTree = "<group>"; };
+		4B6969922157C247009CDD3E /* uBlueViewDisplayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewDisplayController.h; path = ../../../../../include/uBlueViewDisplayController.h; sourceTree = "<group>"; };
+		4B6969932157C247009CDD3E /* uBlueViewMainCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewMainCallback.h; path = ../../../../../include/uBlueViewMainCallback.h; sourceTree = "<group>"; };
+		4B6969942157C247009CDD3E /* uBlueViewMainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewMainController.h; path = ../../../../../include/uBlueViewMainController.h; sourceTree = "<group>"; };
 		4BE0A89D21554D0400F9C402 /* Bluecast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Bluecast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE0A8A021554D0400F9C402 /* Bluecast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bluecast.h; sourceTree = "<group>"; };
 		4BE0A8A121554D0400F9C402 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -90,6 +94,10 @@
 		4B079F80215577AF00CBFACC /* Superglue */ = {
 			isa = PBXGroup;
 			children = (
+				4B6969912157C246009CDD3E /* uBlueViewDisplayCallback.h */,
+				4B6969922157C247009CDD3E /* uBlueViewDisplayController.h */,
+				4B6969932157C247009CDD3E /* uBlueViewMainCallback.h */,
+				4B6969942157C247009CDD3E /* uBlueViewMainController.h */,
 				4B079F882155783F00CBFACC /* uBlueBeacon.h */,
 				4B079F812155783F00CBFACC /* uBlueCallback.h */,
 				4B079F872155783F00CBFACC /* uBlueCastInterface.h */,
@@ -102,8 +110,6 @@
 				4B079F842155783F00CBFACC /* uBlueGattService.h */,
 				4B079F832155783F00CBFACC /* uBluePowerState.h */,
 				4B079F852155783F00CBFACC /* uBlueScanResult.h */,
-				4B079F8E2155784000CBFACC /* uBlueViewCallback.h */,
-				4B079F8A2155784000CBFACC /* uBlueViewController.h */,
 			);
 			path = Superglue;
 			sourceTree = "<group>";
@@ -175,9 +181,7 @@
 			files = (
 				4B079F972155784000CBFACC /* uBlueController.h in Headers */,
 				4B079F932155784000CBFACC /* uBlueScanResult.h in Headers */,
-				4B079F9C2155784000CBFACC /* uBlueViewCallback.h in Headers */,
 				4B079F9A2155784000CBFACC /* uBlueGattConnectionState.h in Headers */,
-				4B079F982155784000CBFACC /* uBlueViewController.h in Headers */,
 				4BE0A8A221554D0400F9C402 /* Bluecast.h in Headers */,
 				4B079F942155784000CBFACC /* uBlueGatt.h in Headers */,
 				4B079F952155784000CBFACC /* uBlueCastInterface.h in Headers */,
@@ -185,6 +189,10 @@
 				4B079F912155784000CBFACC /* uBluePowerState.h in Headers */,
 				4B079F992155784000CBFACC /* uBlueDevice.h in Headers */,
 				4B079F962155784000CBFACC /* uBlueBeacon.h in Headers */,
+				4B6969962157C247009CDD3E /* uBlueViewDisplayController.h in Headers */,
+				4B6969952157C247009CDD3E /* uBlueViewDisplayCallback.h in Headers */,
+				4B6969972157C247009CDD3E /* uBlueViewMainCallback.h in Headers */,
+				4B6969982157C247009CDD3E /* uBlueViewMainController.h in Headers */,
 				4B079F8F2155784000CBFACC /* uBlueCallback.h in Headers */,
 				4B079F922155784000CBFACC /* uBlueGattService.h in Headers */,
 				4B079F9B2155784000CBFACC /* uBlueGattDescriptor.h in Headers */,
