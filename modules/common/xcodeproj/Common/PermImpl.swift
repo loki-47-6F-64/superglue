@@ -20,25 +20,30 @@ private class LocationManagerDelegate : NSObject, CLLocationManagerDelegate {
     }
 }
 
-class PermImpl : uPermissionInterface {
-    var locManager = CLLocationManager()
+public class PermImpl : uPermissionInterface {
+    static var locManager : CLLocationManager?
     
-    func has(_ perm: uPermission) -> Bool {
+    public init() {}
+    public func has(_ perm: uPermission) -> Bool {
         switch perm {
         case .bluetooth, .bluetoothAdmin:
-            return CBPeripheralManager.authorizationStatus() == CBPeripheralManagerAuthorizationStatus.authorized
+            // return CBPeripheralManager.authorizationStatus() == CBPeripheralManagerAuthorizationStatus.authorized
+            return true
         case .coarseLocation:
             return CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedWhenInUse
         }
     }
     
-    func request(_ perm: uPermission, f: uPermissionCallback?) {
+    public func request(_ perm: uPermission, f: uPermissionCallback?) {
         switch perm {
         case .bluetooth, .bluetoothAdmin:
             f!.result(perm, granted: false)
         case .coarseLocation:
-            locManager.delegate = LocationManagerDelegate(callback: f!)
-            locManager.requestWhenInUseAuthorization()
+            if(PermImpl.locManager == nil) {
+                PermImpl.locManager = CLLocationManager()
+            }
+            PermImpl.locManager!.delegate = LocationManagerDelegate(callback: f!)
+            PermImpl.locManager!.requestWhenInUseAuthorization()
         }
     }
 }

@@ -14,7 +14,6 @@
 		4B079F752155697800CBFACC /* SuperglueCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F742155697800CBFACC /* SuperglueCommon.swift */; };
 		4B079F7721556D0100CBFACC /* ThreadImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F7621556D0100CBFACC /* ThreadImpl.swift */; };
 		4B079F79215571AB00CBFACC /* LogImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F78215571AB00CBFACC /* LogImpl.swift */; };
-		4B079F7D2155760D00CBFACC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13EEC211CAF3300F4B241 /* libc++.tbd */; };
 		4BB13EE1211CAE5700F4B241 /* libkitty-err.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED7211CAE5600F4B241 /* libkitty-err.a */; };
 		4BB13EE2211CAE5700F4B241 /* libkitty-file.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED8211CAE5600F4B241 /* libkitty-file.a */; };
 		4BB13EE3211CAE5700F4B241 /* libkitty-utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB13ED9211CAE5600F4B241 /* libkitty-utils.a */; };
@@ -65,7 +64,6 @@
 		4BB13EDC211CAE5700F4B241 /* libsuperglueC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglueC.a; path = ../../libs/libsuperglueC.a; sourceTree = "<group>"; };
 		4BB13EDE211CAE5700F4B241 /* libkitty-server.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-server.a"; path = "../../libs/libkitty-server.a"; sourceTree = "<group>"; };
 		4BB13EE0211CAE5700F4B241 /* libsuperglue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglue.a; path = ../../libs/libsuperglue.a; sourceTree = "<group>"; };
-		4BB13EEC211CAF3300F4B241 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		4BE0A91D21555BB000F9C402 /* uLogInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uLogInterface.h; path = ../../../../include/uLogInterface.h; sourceTree = "<group>"; };
 		4BE0A91E21555BB000F9C402 /* uFileInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uFileInterface.h; path = ../../../../include/uFileInterface.h; sourceTree = "<group>"; };
 		4BE0A91F21555BB000F9C402 /* uLogSeverity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uLogSeverity.h; path = ../../../../include/uLogSeverity.h; sourceTree = "<group>"; };
@@ -83,7 +81,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B079F7D2155760D00CBFACC /* libc++.tbd in Frameworks */,
 				4BB13EE1211CAE5700F4B241 /* libkitty-err.a in Frameworks */,
 				4BB13EE2211CAE5700F4B241 /* libkitty-file.a in Frameworks */,
 				4BB13EE3211CAE5700F4B241 /* libkitty-utils.a in Frameworks */,
@@ -160,7 +157,6 @@
 		4BB13ED4211CAE4200F4B241 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4BB13EEC211CAF3300F4B241 /* libc++.tbd */,
 				4BB13ED7211CAE5600F4B241 /* libkitty-err.a */,
 				4BB13ED8211CAE5600F4B241 /* libkitty-file.a */,
 				4BB13EDB211CAE5700F4B241 /* libkitty-log.a */,
@@ -448,7 +444,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../libs",
 				);
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -484,7 +480,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../libs",
 				);
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;

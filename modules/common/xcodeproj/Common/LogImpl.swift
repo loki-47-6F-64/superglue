@@ -15,6 +15,6 @@ func toString(severity : uLogSeverity) -> String {
 
 class LogImpl : uLogInterface {
     func log(_ serverity: uLogSeverity, message: String) {
-        NSLog("Superglue [/@]", message)
+        NSLog("Superglue [%@]", message)
     }
 }

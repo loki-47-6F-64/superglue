@@ -10,12 +10,12 @@ import Foundation
 import CoreBluetooth
 import CoreLocation
 
-class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeripheralDelegate, CLLocationManagerDelegate {
+public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeripheralDelegate, CLLocationManagerDelegate {
     var centralManager : CBCentralManager?
     let locationManager = CLLocationManager()
     
-    var blueCallback : uBlueCallback?
-    var blueView : uBlueViewCallback?
+    public var blueCallback : uBlueCallback?
+    public var blueView : uBlueViewCallback?
     
     // Only works for single connectections
     //TODO: Use dictionary
@@ -25,15 +25,18 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
         
         self.centralManager = CBCentralManager.init(delegate: self, queue: nil)
         
+        blueCallback = uBlueCastInterface.config(self)
         locationManager.delegate = self
-        locationManager.startRangingBeacons(in: CLBeaconRegion())
+        if CLLocationManager.authorizationStatus() != CLAuthorizationStatus.notDetermined {
+ //           locationManager.startRangingBeacons(in: CLBeaconRegion())
+        }
     }
     
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         blueView.map { $0.onPowerStateChange(Bluetooth.fromState(newState: central.state)) }
     }
     
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+    public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         let name = peripheral.name
         let addr = peripheral.identifier.uuidString
         
@@ -47,7 +50,7 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
                 connectable: true))
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         serviceCount = peripheral.services!.count
         
         for service in peripheral.services! {
@@ -55,26 +58,26 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
         }
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         serviceCount -= 1
         if(serviceCount == 0) {
             blueCallback?.onGattServicesDiscovered(GattBind.init(central: centralManager!, peripheral: peripheral), result: true)
         }
     }
     
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         blueCallback?.onGattConnectionStateChange(
             GattBind.init(central: central, peripheral: peripheral),
             newState: uBlueGattConnectionState.connected)
     }
     
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         blueCallback?.onGattConnectionStateChange(
             GattBind.init(central: central, peripheral: peripheral),
             newState: uBlueGattConnectionState.disconnected)
     }
     
-    func connectGatt(_ dev: uBlueDevice) {
+    public func connectGatt(_ dev: uBlueDevice) {
         let uuid = UUID.init(uuidString: dev.address)!
         
         let peripheral = (centralManager?.retrievePeripherals(withIdentifiers: [uuid])[0])!
@@ -82,7 +85,7 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
         centralManager?.connect(peripheral, options: nil)
     }
     
-    func scan(_ enable: Bool) {
+    public func scan(_ enable: Bool) {
         if(enable) {
             centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -91,11 +94,11 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
         }
     }
     
-    func isEnabled() -> Bool {
+    public func isEnabled() -> Bool {
         return centralManager?.state == CBManagerState.poweredOn
     }
     
-    func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+    public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
         for beacon in beacons {
             blueCallback?.onBeaconUpdate(
                 uBlueBeacon(device: uBlueDevice(name: nil, address: "dummy-addr"),
@@ -106,7 +109,7 @@ class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CBPeriphe
         }
     }
     
-    static func fromState(newState : CBManagerState) -> uBluePowerState {
+    private static func fromState(newState : CBManagerState) -> uBluePowerState {
         switch newState {
         case .poweredOff, .unauthorized, .unsupported, .unknown:
             return uBluePowerState.off

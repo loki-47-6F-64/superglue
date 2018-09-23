@@ -21,16 +21,7 @@
 		4B079F9A2155784000CBFACC /* uBlueGattConnectionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F9B2155784000CBFACC /* uBlueGattDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B079F9C2155784000CBFACC /* uBlueViewCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B079F8E2155784000CBFACC /* uBlueViewCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4B079F9E21557CC800CBFACC /* uBlueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F9D21557CC800CBFACC /* uBlueController.swift */; };
-		4B079FA7215591E000CBFACC /* libkitty-err.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079F9F215591DF00CBFACC /* libkitty-err.a */; };
-		4B079FA8215591E000CBFACC /* libkitty-file.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA0215591DF00CBFACC /* libkitty-file.a */; };
-		4B079FA9215591E000CBFACC /* libkitty-utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA1215591DF00CBFACC /* libkitty-utils.a */; };
-		4B079FAA215591E000CBFACC /* libkitty-ssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA2215591E000CBFACC /* libkitty-ssl.a */; };
-		4B079FAB215591E000CBFACC /* libkitty-log.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA3215591E000CBFACC /* libkitty-log.a */; };
-		4B079FAC215591E000CBFACC /* libsuperglueC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA4215591E000CBFACC /* libsuperglueC.a */; };
-		4B079FAD215591E000CBFACC /* libkitty-server.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA5215591E000CBFACC /* libkitty-server.a */; };
-		4B079FAE215591E000CBFACC /* libsuperglue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FA6215591E000CBFACC /* libsuperglue.a */; };
-		4B079FB02155929100CBFACC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B079FAF2155929100CBFACC /* libc++.tbd */; };
+		4B079F9E21557CC800CBFACC /* BlueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B079F9D21557CC800CBFACC /* BlueController.swift */; };
 		4B696913215627A1009CDD3E /* GattBind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B696912215627A1009CDD3E /* GattBind.swift */; };
 		4B6969152156295A009CDD3E /* GattCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969142156295A009CDD3E /* GattCharacteristic.swift */; };
 		4B6969172156324B009CDD3E /* GattService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6969162156324B009CDD3E /* GattService.swift */; };
@@ -72,16 +63,7 @@
 		4B079F8C2155784000CBFACC /* uBlueGattConnectionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattConnectionState.h; path = ../../../../../include/uBlueGattConnectionState.h; sourceTree = "<group>"; };
 		4B079F8D2155784000CBFACC /* uBlueGattDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueGattDescriptor.h; path = ../../../../../include/uBlueGattDescriptor.h; sourceTree = "<group>"; };
 		4B079F8E2155784000CBFACC /* uBlueViewCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uBlueViewCallback.h; path = ../../../../../include/uBlueViewCallback.h; sourceTree = "<group>"; };
-		4B079F9D21557CC800CBFACC /* uBlueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uBlueController.swift; sourceTree = "<group>"; };
-		4B079F9F215591DF00CBFACC /* libkitty-err.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-err.a"; path = "../../../libs/libkitty-err.a"; sourceTree = "<group>"; };
-		4B079FA0215591DF00CBFACC /* libkitty-file.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-file.a"; path = "../../../libs/libkitty-file.a"; sourceTree = "<group>"; };
-		4B079FA1215591DF00CBFACC /* libkitty-utils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-utils.a"; path = "../../../libs/libkitty-utils.a"; sourceTree = "<group>"; };
-		4B079FA2215591E000CBFACC /* libkitty-ssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-ssl.a"; path = "../../../libs/libkitty-ssl.a"; sourceTree = "<group>"; };
-		4B079FA3215591E000CBFACC /* libkitty-log.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-log.a"; path = "../../../libs/libkitty-log.a"; sourceTree = "<group>"; };
-		4B079FA4215591E000CBFACC /* libsuperglueC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglueC.a; path = ../../../libs/libsuperglueC.a; sourceTree = "<group>"; };
-		4B079FA5215591E000CBFACC /* libkitty-server.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkitty-server.a"; path = "../../../libs/libkitty-server.a"; sourceTree = "<group>"; };
-		4B079FA6215591E000CBFACC /* libsuperglue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperglue.a; path = ../../../libs/libsuperglue.a; sourceTree = "<group>"; };
-		4B079FAF2155929100CBFACC /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		4B079F9D21557CC800CBFACC /* BlueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueController.swift; sourceTree = "<group>"; };
 		4B696912215627A1009CDD3E /* GattBind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattBind.swift; sourceTree = "<group>"; };
 		4B6969142156295A009CDD3E /* GattCharacteristic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattCharacteristic.swift; sourceTree = "<group>"; };
 		4B6969162156324B009CDD3E /* GattService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GattService.swift; sourceTree = "<group>"; };
@@ -98,15 +80,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B079FB02155929100CBFACC /* libc++.tbd in Frameworks */,
-				4B079FA7215591E000CBFACC /* libkitty-err.a in Frameworks */,
-				4B079FA8215591E000CBFACC /* libkitty-file.a in Frameworks */,
-				4B079FA9215591E000CBFACC /* libkitty-utils.a in Frameworks */,
-				4B079FAA215591E000CBFACC /* libkitty-ssl.a in Frameworks */,
-				4B079FAB215591E000CBFACC /* libkitty-log.a in Frameworks */,
-				4B079FAC215591E000CBFACC /* libsuperglueC.a in Frameworks */,
-				4B079FAD215591E000CBFACC /* libkitty-server.a in Frameworks */,
-				4B079FAE215591E000CBFACC /* libsuperglue.a in Frameworks */,
 				4BE0A8B221554D6F00F9C402 /* Common.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -168,7 +141,7 @@
 			children = (
 				4B079F80215577AF00CBFACC /* Superglue */,
 				4B69690F21562781009CDD3E /* Gatt */,
-				4B079F9D21557CC800CBFACC /* uBlueController.swift */,
+				4B079F9D21557CC800CBFACC /* BlueController.swift */,
 				4BE0A8A021554D0400F9C402 /* Bluecast.h */,
 				4BE0A8B521554FB300F9C402 /* Bluecast.swift */,
 				4BE0A8A121554D0400F9C402 /* Info.plist */,
@@ -179,15 +152,6 @@
 		4BE0A8A821554D6600F9C402 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4B079FAF2155929100CBFACC /* libc++.tbd */,
-				4B079F9F215591DF00CBFACC /* libkitty-err.a */,
-				4B079FA0215591DF00CBFACC /* libkitty-file.a */,
-				4B079FA3215591E000CBFACC /* libkitty-log.a */,
-				4B079FA5215591E000CBFACC /* libkitty-server.a */,
-				4B079FA2215591E000CBFACC /* libkitty-ssl.a */,
-				4B079FA1215591DF00CBFACC /* libkitty-utils.a */,
-				4B079FA6215591E000CBFACC /* libsuperglue.a */,
-				4B079FA4215591E000CBFACC /* libsuperglueC.a */,
 				4BE0A8A921554D6700F9C402 /* Common.xcodeproj */,
 			);
 			name = Frameworks;
@@ -323,7 +287,7 @@
 				4B6969172156324B009CDD3E /* GattService.swift in Sources */,
 				4BE0A8B621554FB300F9C402 /* Bluecast.swift in Sources */,
 				4B696913215627A1009CDD3E /* GattBind.swift in Sources */,
-				4B079F9E21557CC800CBFACC /* uBlueController.swift in Sources */,
+				4B079F9E21557CC800CBFACC /* BlueController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,7 +434,7 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../../libs";
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = Loki.Bluecast;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -500,7 +464,7 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../../libs";
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = Loki.Bluecast;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
