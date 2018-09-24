@@ -18,8 +18,6 @@ class GattBind : uBlueGatt {
         self.central    = central
     }
     
-    func close() {}
-    
     func read(_ characteristic: uBlueGattCharacteristic?) {
         let charac = characteristic as! GattCharaceristic
         
