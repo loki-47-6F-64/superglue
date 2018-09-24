@@ -30,7 +30,7 @@ public:
       this->future.swap(future);
     }
   };
-private:
+protected:
   std::deque<__task> _tasks;
   std::vector<std::pair<__time_point, __task>> _timer_tasks; 
   std::mutex _task_mutex;
@@ -58,7 +58,7 @@ public:
    * @return an id to potentially delay the task
    */
   template<class Function, class X, class Y, class... Args>
-  auto pushTimed(Function &&newTask, std::chrono::duration<X, Y> duration, Args &&... args) {
+  auto pushDelayed(Function &&newTask, std::chrono::duration<X, Y> duration, Args &&... args) {
     typedef decltype(newTask(std::forward<Args>(args)...)) __return;
     typedef std::packaged_task<__return()> task_t;
     
@@ -92,7 +92,7 @@ public:
    * @param duration The delay before executing the task
    */
   template<class X, class Y>
-  void delayTask(task_id_t task_id, std::chrono::duration<X, Y> duration) {
+  void delay(task_id_t task_id, std::chrono::duration<X, Y> duration) {
     std::lock_guard<std::mutex> lg(_task_mutex);
 
     auto it = _timer_tasks.begin();
@@ -117,18 +117,18 @@ public:
     }
   }
 
-    void cancelTask(task_id_t task_id) {
-      std::lock_guard<std::mutex> lg(_task_mutex);
-        
-      auto it = _timer_tasks.begin();
-      for(; it < _timer_tasks.cend(); ++it) {
-        const __task &task = std::get<1>(*it);
-            
-        if(&*task == task_id) {
-          _timer_tasks.erase(it);
-        }
+  void cancel(task_id_t task_id) {
+    std::lock_guard<std::mutex> lg(_task_mutex);
+
+    auto it = _timer_tasks.begin();
+    for(; it < _timer_tasks.cend(); ++it) {
+      const __task &task = std::get<1>(*it);
+
+      if(&*task == task_id) {
+        _timer_tasks.erase(it);
       }
     }
+  }
     
   util::Optional<__task> pop() {
     std::lock_guard<std::mutex> lg(_task_mutex);
@@ -147,6 +147,12 @@ public:
     }
     
     return {};
+  }
+
+  bool ready() {
+    std::lock_guard<std::mutex> lg(_task_mutex);
+
+    return !_tasks.empty() || (!_timer_tasks.empty() && std::get<0>(_timer_tasks.back()) <= std::chrono::steady_clock::now());
   }
 
   __time_point next() {

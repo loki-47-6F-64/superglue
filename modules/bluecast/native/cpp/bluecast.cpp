@@ -37,8 +37,20 @@ std::shared_ptr<gen::BlueController> &blueManager() {
   return _blueManager;
 }
 
-util::TaskPool &tasks() {
-  static util::TaskPool taskPool;
+bluecast::TaskPool &tasks() {
+  static bluecast::TaskPool taskPool;
+
+  return taskPool;
+}
+
+bluecast::TaskPool &tasksMainView() {
+  static bluecast::TaskPool taskPool;
+
+  return taskPool;
+}
+
+bluecast::TaskPool &tasksDisplayView() {
+  static bluecast::TaskPool taskPool;
 
   return taskPool;
 }
@@ -69,11 +81,12 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   const auto &dev = scan.dev;
     
   if(dev.name == "Viking") {
-    tasks().cancelTask(_peripheral_scan_task_id);
-    tasks().push([](const auto &dev, auto blue_view_main_controller) {
+    tasks().cancel(_peripheral_scan_task_id);
+
+    tasksMainView().push([this, dev]() {
       blueManager()->peripheral_scan(false);
-      blue_view_main_controller->launch_view_display(dev);
-    }, dev, _blue_view_main_callback->get_blue_view_controller());
+      _blue_view_main_callback->get_blue_view_controller()->launch_view_display(dev);
+    });
   }
 }
 
@@ -122,9 +135,9 @@ void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &
     log(gen::LogSeverity::INFO, "value::" + characteristic->get_string_value(0));
   }
 
-  if(_blue_view_display_callback) {
+  tasksDisplayView().push([this, characteristic]() {
     _blue_view_display_callback->blue_view_display_controller()->display(_blue_view_display_callback->get_device(), characteristic->get_string_value(0));
-  }
+  });
 }
 
 std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
@@ -135,11 +148,8 @@ std::shared_ptr<gen::BlueViewMainCallback> BlueCallback::on_create_main(
 
   _blue_view_main_callback = std::make_shared<BlueViewMainCallback>(blue_view, permission_manager);
 
-  tasks().push([this]() {
-    if(!_blue_view_main_callback) {
-      return;
-    }
-      
+  tasksMainView().start();
+  tasksMainView().push([this]() {
     auto &control = _blue_view_main_callback->get_blue_view_controller();
     for(const auto &beacon : _blue_beacons) {
       control->beacon_list_update(beacon.second.beacon);
@@ -157,6 +167,8 @@ std::shared_ptr<gen::BlueViewDisplayCallback> BlueCallback::on_create_display(
 
   _blue_view_display_callback = std::make_shared<BlueViewDisplayCallback>(blue_view, device);
 
+  tasksDisplayView().start();
+
   blueManager()->connect_gatt(device);
 
   return _blue_view_display_callback;
@@ -164,15 +176,17 @@ std::shared_ptr<gen::BlueViewDisplayCallback> BlueCallback::on_create_display(
 
 void BlueCallback::on_destroy_main() {
   log(gen::LogSeverity::DEBUG, "on_destroy_main");
+
+  tasksMainView().clear();
   _blue_view_main_callback.reset();
 }
 
 void BlueCallback::on_destroy_display() {
   log(gen::LogSeverity::DEBUG, "on_destroy_display");
-  TASK(this,
-       _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
-    _blue_view_display_callback.reset()
-  );
+
+  tasksDisplayView().clear();
+  _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
+  _blue_view_display_callback.reset();
 }
 
 void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
@@ -183,39 +197,39 @@ void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
       }
       
       blueManager()->peripheral_scan(true);
-      _peripheral_scan_task_id = tasks().pushTimed([this]() {
+      _peripheral_scan_task_id = tasks().pushDelayed([this]() {
         blueManager()->peripheral_scan(false);
-        
+
         // Let it be known that the task has been completed
-        _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
+        _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) { };
       }, std::chrono::seconds(1)).task_id;
     );
   }
     
   tasks().push([this](gen::BlueBeacon &&beacon) {
-    if(_blue_view_main_callback) {
+    tasksMainView().push([this, beacon]() {
       _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);
-    }
+    });
 
     auto it = _blue_beacons.find(beacon.uuid);
 
     util::TaskPool::task_id_t task_id;
     // If beacon first appears...
     if(it == _blue_beacons.cend()) {
-      auto delayed_task = tasks().pushTimed([this](const auto &beacon) {
+      auto delayed_task = tasks().pushDelayed([this, beacon]() {
 
-        if(_blue_view_main_callback) {
+        tasksMainView().push([this, beacon]() {
           _blue_view_main_callback->get_blue_view_controller()->beacon_list_remove(beacon);
-        }
+        });
 
         _blue_beacons.erase(beacon.uuid);
-      }, std::chrono::seconds(3), beacon);
+      }, std::chrono::seconds(1));
 
       task_id = delayed_task.task_id;
     }
     else {
       task_id = it->second.beacon_timeout_id;
-      tasks().delayTask(task_id, std::chrono::seconds(3));
+      tasks().delay(task_id, std::chrono::seconds(3));
     }
 
     _blue_beacons.emplace(beacon.uuid, beacon_t { beacon, task_id });
@@ -255,21 +269,34 @@ std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::config(
 
   bluecast::thread().run(
     [] () {
+      bluecast::tasks().start();
       bluecast::log(LogSeverity::DEBUG, "started main superglue loop");
     },
     []() {
-      while (auto task = bluecast::tasks().pop()) {
-        auto _begin = std::chrono::steady_clock::now();
-        (*task)->run();
-        auto milli = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _begin);
+      auto &tasks            = bluecast::tasks();
+      auto &tasksMainView    = bluecast::tasksMainView();
+      auto &tasksDisplayView = bluecast::tasksDisplayView();
 
-        if(milli.count() > 100) {
-          logManager->log(gen::LogSeverity::WARN, "duration of task => [" + std::to_string(milli.count()) + "] milliseconds");
+
+      while(tasks.ready() || tasksMainView.ready() || tasksDisplayView.ready()) {
+        if(auto task = tasks.pop()) {
+          tasks.run(task);
+        }
+
+        if(auto task = tasksMainView.pop()) {
+          tasksMainView.run(task);
+        }
+
+        if(auto task = tasksDisplayView.pop()) {
+          tasksDisplayView.run(task);
         }
       }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }, []() {});
+    },
+    []() {
+      bluecast::tasks().clear();
+    });
 
   return std::make_shared<bluecast::BlueCallback>();
 }

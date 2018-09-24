@@ -28,11 +28,11 @@ BlueViewMainCallback::BlueViewMainCallback(
     request_permission(gen::Permission::COARSE_LOCATION, permission_manager);
   }
 
-
+  _permission_manager = permission_manager;
 }
 
 void BlueViewMainCallback::on_toggle_scan(bool scan) {
-  tasks().push([](auto view, auto scan) {
+  tasksMainView().push([](auto view, auto scan) {
     if(scan && !blueManager()->is_enabled()) {
       view->blue_enable(true);
     } else {
@@ -42,6 +42,6 @@ void BlueViewMainCallback::on_toggle_scan(bool scan) {
 }
 
 void BlueViewMainCallback::on_select_device(const gen::BlueDevice &dev) {
-  tasks().push([this, dev]() { _blue_view_main_controller->launch_view_display(dev); });
+  tasksMainView().push([this, dev]() { _blue_view_main_controller->launch_view_display(dev); });
 }
 /* bluecast */ }

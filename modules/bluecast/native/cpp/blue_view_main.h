@@ -17,6 +17,7 @@ class PermissionInterface;
 namespace bluecast {
 class BlueViewMainCallback : public gen::BlueViewMainCallback {
   std::shared_ptr<gen::BlueViewMainController> _blue_view_main_controller;
+  std::shared_ptr<gen::PermissionInterface> _permission_manager;
 public:
   const std::shared_ptr<gen::BlueViewMainController> &get_blue_view_controller() const { return _blue_view_main_controller; }
 
