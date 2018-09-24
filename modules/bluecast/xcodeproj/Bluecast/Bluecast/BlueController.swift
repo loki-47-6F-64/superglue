@@ -18,11 +18,12 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
     let region = CLBeaconRegion(proximityUUID: UUID.init(uuidString: "ffebb31d-ae63-4c4f-bc76-4658073cf483")!, identifier: "uniqueID")
     
     public var blueCallback : uBlueCallback?
-    public var blueView : uBlueViewMainCallback?
     
     // Only works for single connectections
     //TODO: Use dictionary
     var serviceCount : [UUID : Int] = [:]
+    var peripherals : [CBPeripheral] = []
+    
     public override init() {
         super.init()
         
@@ -61,6 +62,13 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
             blueCallback?.onGattServicesDiscovered(GattBind.init(central: centralManager!, peripheral: peripheral), result: true)
         }
     }
+  
+  public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    blueCallback?.onCharacteristicRead(
+      GattBind(central: centralManager!,peripheral: peripheral),
+      characteristic: GattCharaceristic(characteristic: characteristic),
+      result: true)
+  }
     
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         blueCallback?.onGattConnectionStateChange(
@@ -69,6 +77,17 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
     }
     
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        DispatchQueue.main.async {
+            // There is at leas one peripheral connected
+            for i in 0 ... self.peripherals.count - 1 {
+                if(self.peripherals[i] == peripheral) {
+                    self.peripherals.remove(at: i)
+                    
+                    break
+                }
+            }
+        }
+        
         blueCallback?.onGattConnectionStateChange(
             GattBind.init(central: central, peripheral: peripheral),
             newState: uBlueGattConnectionState.disconnected)
@@ -79,6 +98,11 @@ public class Bluetooth : NSObject, uBlueController, CBCentralManagerDelegate, CB
         
         let peripheral = (centralManager?.retrievePeripherals(withIdentifiers: [uuid])[0])!
         
+        DispatchQueue.main.async {
+            self.peripherals.append(peripheral);
+        }
+        
+        peripheral.delegate = self
         centralManager?.connect(peripheral, options: nil)
     }
     

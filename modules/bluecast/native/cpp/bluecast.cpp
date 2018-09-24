@@ -30,6 +30,12 @@
 #include "blue_view_main.h"
 #include "blue_view_display.h"
 
+bool stringEqual(const std::string &left, const std::string &right) {
+  return left.size() == right.size() && std::equal(left.cbegin(), left.cend(), right.cbegin(), [](auto l, auto r) {
+    return std::toupper(l) == std::toupper(r);
+  });
+}
+
 namespace bluecast {
 std::shared_ptr<gen::BlueController> &blueManager() {
   static std::shared_ptr<gen::BlueController> _blueManager;
@@ -80,7 +86,7 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
 
   const auto &dev = scan.dev;
     
-  if(dev.name == "Viking") {
+  if(dev.name == "Viking" || dev.name == "Loki") {
     tasks().cancel(_peripheral_scan_task_id);
 
     tasksMainView().push([this, dev]() {
@@ -98,11 +104,14 @@ void BlueCallback::on_gatt_services_discovered(const std::shared_ptr<gen::BlueGa
         log(gen::LogSeverity::INFO, "service::" + service->uuid());
         for(const auto &characteristic : service->characteristics()) {
           log(gen::LogSeverity::INFO, "characteristic::" + characteristic->uuid());
-          if(characteristic->uuid() != "2096d612-39b6-41bf-b511-0f8ade8ef6c0") {
+          if(!stringEqual(characteristic->uuid(), "2096d612-39b6-41bf-b511-0f8ade8ef6c0")) {
             continue;
           }
 
-          TASK(=, gatt->read_characteristic(characteristic));
+          tasks().push([gatt, characteristic]() {
+            log(gen::LogSeverity::DEBUG, "gatt->read_characteristic(characteristic)");
+            gatt->read_characteristic(characteristic);
+          });
 
           for(const auto &descriptor : characteristic->descriptors()) {
             log(gen::LogSeverity::INFO, "descriptor::" + descriptor->uuid());
@@ -296,6 +305,9 @@ std::shared_ptr<gen::BlueCallback> gen::BlueCastInterface::config(
     },
     []() {
       bluecast::tasks().clear();
+    },
+    []() {
+      bluecast::log(gen::LogSeverity::WARN, "bluecast::thread() not responding");
     });
 
   return std::make_shared<bluecast::BlueCallback>();
