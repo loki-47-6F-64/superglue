@@ -2,14 +2,14 @@
 // Created by loki on 20-9-18.
 //
 
-#include <log_severity.hpp>
+#include <generated-src/log_severity.hpp>
 
-#include <blue_power_state.hpp>
+#include <generated-src/blue_power_state.hpp>
 
-#include <blue_view_main_controller.hpp>
-#include <blue_controller.hpp>
+#include <generated-src/blue_view_main_controller.hpp>
+#include <generated-src/blue_controller.hpp>
 
-#include <blue_device.hpp>
+#include <generated-src/blue_device.hpp>
 #include "blue_view_main.h"
 
 #include "permission.h"

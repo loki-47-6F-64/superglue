@@ -1,10 +1,10 @@
 #include <type_traits>
-#include <log_interface.hpp>
-#include <log_severity.hpp>
+#include <generated-src/log_interface.hpp>
+#include <generated-src/log_severity.hpp>
 
-#include <permission_interface.hpp>
-#include <permission.hpp>
-#include <permission_callback.hpp>
+#include <generated-src/permission_interface.hpp>
+#include <generated-src/permission.hpp>
+#include <generated-src/permission_callback.hpp>
 
 #include "config.hpp"
 #include "thread_t.hpp"

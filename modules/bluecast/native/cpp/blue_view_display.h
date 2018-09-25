@@ -6,9 +6,9 @@
 #define SUPERGLUE_BLUE_VIEW_DISPLAY_H
 
 #include <memory>
-#include <blue_view_display_callback.hpp>
+#include <generated-src/blue_view_display_callback.hpp>
 
-#include <blue_device.hpp>
+#include <generated-src/blue_device.hpp>
 
 namespace gen {
 class BlueViewDisplayController;

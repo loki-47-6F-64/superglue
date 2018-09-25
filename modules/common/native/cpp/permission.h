@@ -8,8 +8,8 @@
 #include <type_traits>
 #include <functional>
 
-#include <permission_callback.hpp>
-#include <permission_interface.hpp>
+#include <generated-src/permission_callback.hpp>
+#include <generated-src/permission_interface.hpp>
 
 class PermFunc : public gen::PermissionCallback {
 

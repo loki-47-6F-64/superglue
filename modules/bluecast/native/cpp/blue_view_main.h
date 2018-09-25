@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <blue_view_main_callback.hpp>
+#include <generated-src/blue_view_main_callback.hpp>
 
 #include <kitty/util/task_pool.h>
 

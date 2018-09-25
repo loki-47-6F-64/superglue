@@ -1,11 +1,13 @@
 #pragma once
 
-#include "config.hpp"
-#include "thread_callback.hpp"
-
 #include <system_error>
 #include <functional>
 #include <thread>
+
+#include <generated-src/thread_callback.hpp>
+#include <generated-src/thread_interface.hpp>
+
+#include "config.hpp"
 
 template<class Function>
 class _Impl : public gen::ThreadCallback {

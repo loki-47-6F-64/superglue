@@ -7,16 +7,18 @@
 
 #include <map>
 
-#include <blue_cast_interface.hpp>
+#include <generated-src/log_interface.hpp>
 
-#include <blue_callback.hpp>
-#include <blue_view_main_callback.hpp>
+#include <generated-src/blue_cast_interface.hpp>
 
-#include <blue_power_state.hpp>
-#include <blue_beacon.hpp>
+#include <generated-src/blue_callback.hpp>
+#include <generated-src/blue_view_main_callback.hpp>
 
-#include <permission.hpp>
-#include <log_severity.hpp>
+#include <generated-src/blue_power_state.hpp>
+#include <generated-src/blue_beacon.hpp>
+
+#include <generated-src/permission.hpp>
+#include <generated-src/log_severity.hpp>
 
 #include <kitty/util/task_pool.h>
 #include <kitty/util/auto_run.h>

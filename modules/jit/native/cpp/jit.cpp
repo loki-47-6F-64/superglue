@@ -2,13 +2,14 @@
 
 #include <cassert>
 
-#include <jit_interface.hpp>
+#include <generated-src/jit_interface.hpp>
 #include <kitty/util/utility.h>
 #include <kitty/util/set.h>
 #include <kitty/util/string.h>
 #include <config.hpp>
 
-#include <log_severity.hpp>
+#include <generated-src/log_interface.hpp>
+#include <generated-src/log_severity.hpp>
 #include "jit.hpp"
 
 namespace jit {

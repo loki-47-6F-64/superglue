@@ -5,21 +5,23 @@
 
 #include <map>
 
-#include <blue_cast_interface.hpp>
-#include <log_severity.hpp>
-#include <blue_scan_result.hpp>
-#include <blue_controller.hpp>
+#include <generated-src/log_severity.hpp>
+#include <generated-src/log_interface.hpp>
 
-#include <blue_view_main_controller.hpp>
-#include <blue_view_display_controller.hpp>
+#include <generated-src/blue_cast_interface.hpp>
+#include <generated-src/blue_scan_result.hpp>
+#include <generated-src/blue_controller.hpp>
 
-#include <blue_beacon.hpp>
+#include <generated-src/blue_view_main_controller.hpp>
+#include <generated-src/blue_view_display_controller.hpp>
 
-#include <blue_gatt.hpp>
-#include <blue_gatt_service.hpp>
-#include <blue_gatt_characteristic.hpp>
-#include <blue_gatt_descriptor.hpp>
-#include <blue_gatt_connection_state.hpp>
+#include <generated-src/blue_beacon.hpp>
+
+#include <generated-src/blue_gatt.hpp>
+#include <generated-src/blue_gatt_service.hpp>
+#include <generated-src/blue_gatt_characteristic.hpp>
+#include <generated-src/blue_gatt_descriptor.hpp>
+#include <generated-src/blue_gatt_connection_state.hpp>
 
 #include <kitty/util/move_by_copy.h>
 
