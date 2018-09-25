@@ -87,10 +87,9 @@ void BlueCallback::on_scan_result(const gen::BlueScanResult &scan) {
   const auto &dev = scan.dev;
     
   if(dev.name == "Viking" || dev.name == "Loki") {
-    tasks().cancel(_peripheral_scan_task_id);
-
     tasksMainView().push([this, dev]() {
       blueManager()->peripheral_scan(false);
+      tasks().cancel(_blue_view_main_callback->get_peripheral_scan_task_id());
       _blue_view_main_callback->get_blue_view_controller()->launch_view_display(dev);
     });
   }
@@ -194,27 +193,10 @@ void BlueCallback::on_destroy_display() {
   log(gen::LogSeverity::DEBUG, "on_destroy_display");
 
   tasksDisplayView().clear();
-  _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) {};
   _blue_view_display_callback.reset();
 }
 
 void BlueCallback::on_beacon_update(const gen::BlueBeacon &beacon) {
-  if(beacon.distance < 1.0) {
-    TASK(this,
-      if(_peripheral_scan_task_id) {
-        return;
-      }
-      
-      blueManager()->peripheral_scan(true);
-      _peripheral_scan_task_id = tasks().pushDelayed([this]() {
-        blueManager()->peripheral_scan(false);
-
-        // Let it be known that the task has been completed
-        _peripheral_scan_task_id = decltype(_peripheral_scan_task_id) { };
-      }, std::chrono::seconds(1)).task_id;
-    );
-  }
-    
   tasks().push([this](gen::BlueBeacon &&beacon) {
     tasksMainView().push([this, beacon]() {
       _blue_view_main_callback->get_blue_view_controller()->beacon_list_update(beacon);

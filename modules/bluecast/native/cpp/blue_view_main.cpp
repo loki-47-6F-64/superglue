@@ -41,7 +41,17 @@ void BlueViewMainCallback::on_toggle_scan(bool scan) {
   }, _blue_view_main_controller, scan);
 }
 
-void BlueViewMainCallback::on_select_device(const gen::BlueDevice &dev) {
-  tasksMainView().push([this, dev]() { _blue_view_main_controller->launch_view_display(dev); });
+void BlueViewMainCallback::on_search_device() {
+  tasks().push([]() {
+    blueManager()->peripheral_scan(true);
+  });
+
+  _peripheral_scan_task_id = tasks().pushDelayed([]() {
+    blueManager()->peripheral_scan(false);
+  }, std::chrono::seconds(1)).task_id;
+}
+
+const util::TaskPool::task_id_t BlueViewMainCallback::get_peripheral_scan_task_id() const {
+  return _peripheral_scan_task_id;
 }
 /* bluecast */ }

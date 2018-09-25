@@ -52,7 +52,8 @@ blue_gatt = interface {
 
 blue_view_main_callback = interface +c {
   on_toggle_scan(scan : bool);
-  on_select_device(dev : blue_device);
+
+  on_search_device();
 }
 
 blue_view_display_callback = interface +c {
