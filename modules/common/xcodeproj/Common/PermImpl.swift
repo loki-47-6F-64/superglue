@@ -21,7 +21,8 @@ private class LocationManagerDelegate : NSObject, CLLocationManagerDelegate {
 }
 
 public class PermImpl : uPermissionInterface {
-    static var locManager : CLLocationManager?
+    var locManager                 : CLLocationManager?
+    private var locManagerDelegate : LocationManagerDelegate?
     
     public init() {}
     public func has(_ perm: uPermission) -> Bool {
@@ -39,11 +40,13 @@ public class PermImpl : uPermissionInterface {
         case .bluetooth, .bluetoothAdmin:
             f!.result(perm, granted: false)
         case .coarseLocation:
-            if(PermImpl.locManager == nil) {
-                PermImpl.locManager = CLLocationManager()
+            if(locManager == nil) {
+                locManager = CLLocationManager()
             }
-            PermImpl.locManager!.delegate = LocationManagerDelegate(callback: f!)
-            PermImpl.locManager!.requestWhenInUseAuthorization()
+            
+            locManagerDelegate = LocationManagerDelegate(callback: f!)
+            locManager!.delegate = locManagerDelegate
+            locManager!.requestWhenInUseAuthorization()
         }
     }
 }
