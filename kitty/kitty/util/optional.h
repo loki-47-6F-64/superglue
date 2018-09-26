@@ -110,6 +110,7 @@ public:
   
   Optional(elem_t &&val) : _obj(std::move(val)) {}
   Optional(const elem_t &val) : _obj(val) {}
+  Optional(std::nullptr_t) : _obj() {}
   
   Optional &operator = (elem_t &&elem) { _obj = std::move(elem); return *this; }
   Optional &operator = (const elem_t &elem) { _obj = elem; return *this; }

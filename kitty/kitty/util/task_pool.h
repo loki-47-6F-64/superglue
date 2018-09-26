@@ -106,6 +106,10 @@ public:
       }
     }
 
+    if(it == _timer_tasks.cend()) {
+      return;
+    }
+
     // smaller time goes to the back
     auto prev = it -1;
     while(it > _timer_tasks.cbegin()) {

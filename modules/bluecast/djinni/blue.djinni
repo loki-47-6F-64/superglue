@@ -50,38 +50,31 @@ blue_gatt = interface {
   read_characteristic(characteristic : blue_gatt_characteristic);
 }
 
-blue_view_main_callback = interface +c {
-  on_toggle_scan(scan : bool);
-
-  on_search_device();
-}
-
-blue_view_display_callback = interface +c {
-  
-}
-
 blue_callback = interface +c {
+  on_beacon_scan_enable(enable : bool);
+  on_beacon_update(beacon : blue_beacon);
+
   on_blue_power_state_change(new_state : blue_power_state);
   
   on_scan_result(scan : blue_scan_result);
+
+  on_select_device(device : blue_device);
 
   on_gatt_services_discovered(gatt : blue_gatt, result : bool);
   on_gatt_connection_state_change(gatt : blue_gatt, new_state : blue_gatt_connection_state);
 
   on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
 
-  on_beacon_update(beacon : blue_beacon);
-
   # Creating the functions that need an activity to run
   on_create_main(
     blue_view : blue_view_main_controller,
     permission_manager : permission_interface
-  ) : blue_view_main_callback;
+  );
 
   on_create_display(
     device    : blue_device,
     blue_view : blue_view_display_controller
-  ) : blue_view_display_callback;
+  );
 
   on_destroy_main();
   on_destroy_display();
@@ -90,8 +83,7 @@ blue_callback = interface +c {
 blue_view_main_controller = interface +j +o {
   blue_enable(enable : bool);
 
-  beacon_list_update(beacon : blue_beacon);
-  beacon_list_remove(beacon : blue_beacon);
+  set_device_list(device : list<blue_device>);
 
   launch_view_display(device : blue_device);
 }

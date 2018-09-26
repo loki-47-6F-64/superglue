@@ -137,6 +137,10 @@ public class Bluetooth extends BluetoothGattCallback {
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        if(newState == BluetoothGatt.STATE_DISCONNECTED) {
+            gatt.close();
+        }
+
         blCall.onGattConnectionStateChange(new GattBind(gatt), fromGattState(newState));
     }
 

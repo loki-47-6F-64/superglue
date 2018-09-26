@@ -34,13 +34,7 @@ namespace util {
   }
   
   template<class It, class Function>
-  inline auto map_if(It begin, It end, Function &&f) ->
-  std::vector<
-  typename std::remove_const<
-  typename std::remove_reference<decltype(*f(*begin))>::type
-  >::type
-  >
-  {
+  inline auto map_if(It begin, It end, Function &&f) {
     typedef
     typename std::remove_const<
     typename std::remove_reference<decltype(*f(*begin))>::type
@@ -61,19 +55,12 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto map_if(From &&from, Function &&f) -> decltype(map_if(std::begin(from), std::end(from), f))
-  {
+  inline auto map_if(From &&from, Function &&f) {
     return map_if(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   
   template<class It, class Function>
-  inline auto map(It begin, It end, Function &&f) ->
-  std::vector<
-  typename std::remove_const<
-  typename std::remove_reference<decltype(f(*begin))>::type
-  >::type
-  >
-  {
+  inline auto map(It begin, It end, Function &&f) {
     typedef decltype(*begin) input_t;
     typedef typename std::remove_const<
     typename std::remove_reference<decltype(f(*begin))>::type
@@ -85,12 +72,12 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto map(From &&from, Function &&f) -> decltype(map(std::begin(from), std::end(from), f)) {
+  inline auto map(From &&from, Function &&f) {
     return map(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   
   template<class It, class Function>
-  inline auto fold(It begin, It end, Function &&f) -> decltype(f(*begin, *begin)) {
+  inline auto fold(It begin, It end, Function &&f) {
     if(begin + 1 == end) {
       return *begin;
     }
@@ -101,7 +88,7 @@ namespace util {
   }
   
   template<class From, class Function>
-  inline auto fold(From &&from, Function &&f) -> decltype(fold(std::begin(from), std::end(from), f)) {
+  inline auto fold(From &&from, Function &&f) {
     return fold(std::begin(from), std::end(from), std::forward<Function>(f));
   }
   

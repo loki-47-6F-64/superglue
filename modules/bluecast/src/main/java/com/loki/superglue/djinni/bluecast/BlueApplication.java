@@ -19,7 +19,13 @@ public class BlueApplication extends Application {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onBluePowerStateChange(Bluetooth.fromPowerState(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF)));
+                int newState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
+
+                if(newState == BluetoothAdapter.STATE_TURNING_OFF || newState == BluetoothAdapter.STATE_TURNING_ON) {
+                    return;
+                }
+
+                SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onBluePowerStateChange(Bluetooth.fromPowerState(newState));
             }
         };
 
