@@ -181,7 +181,11 @@ void BlueCallback::on_create_main(
 
   tasksMainView().start();
 
-  _update_device_list();
+  tasks().push([this]() {
+    if(blueManager()->is_enabled()) {
+      _update_device_list();
+    }
+  });
 }
 
 void BlueCallback::on_create_display(
