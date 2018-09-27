@@ -141,7 +141,21 @@ public class Bluetooth extends BluetoothGattCallback {
             gatt.close();
         }
 
+        // Reflect automatic MTU request in IOS
+        if(newState == BluetoothGatt.STATE_CONNECTED) {
+            gatt.requestMtu(517);
+
+            return;
+        }
+
         blCall.onGattConnectionStateChange(new GattBind(gatt), fromGattState(newState));
+    }
+
+    @Override
+    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+        super.onMtuChanged(gatt, mtu, status);
+
+        blCall.onGattConnectionStateChange(new GattBind(gatt), fromGattState(BluetoothGatt.STATE_CONNECTED));
     }
 
     @Override
@@ -165,7 +179,6 @@ public class Bluetooth extends BluetoothGattCallback {
                             int major = beacon.getId2().toInt();
                             int minor = beacon.getId3().toInt();
 
-                            BluetoothDevice device = btAdap.getRemoteDevice(beacon.getBluetoothAddress());
                             blCall.onBeaconUpdate(new BlueBeacon(
                                     uuid.toString(),
                                     major,
