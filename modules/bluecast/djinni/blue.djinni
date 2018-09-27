@@ -65,19 +65,18 @@ blue_callback = interface +c {
 
   on_characteristic_read(gatt : blue_gatt, characteristic : blue_gatt_characteristic, result : bool);
 
-  # Creating the functions that need an activity to run
-  on_create_main(
+  on_start_main(
     blue_view : blue_view_main_controller,
     permission_manager : permission_interface
   );
 
-  on_create_display(
+  on_start_display(
     device    : blue_device,
     blue_view : blue_view_display_controller
   );
 
-  on_destroy_main();
-  on_destroy_display();
+  on_stop_main();
+  on_stop_display();
 }
 
 blue_view_main_controller = interface +j +o {

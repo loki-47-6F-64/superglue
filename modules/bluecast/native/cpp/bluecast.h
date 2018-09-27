@@ -67,15 +67,15 @@ public:
 
   void on_select_device(const gen::BlueDevice &device) override;
 
-  void on_create_main(
+  void on_start_main(
     const std::shared_ptr<gen::BlueViewMainController> &blue_view,
     const std::shared_ptr<gen::PermissionInterface> &permission_manager) override;
 
-  void on_destroy_main() override;
+  void on_stop_main() override;
 
-  void on_create_display(const gen::BlueDevice& device, const std::shared_ptr<gen::BlueViewDisplayController> &blue_view) override;
+  void on_start_display(const gen::BlueDevice& device, const std::shared_ptr<gen::BlueViewDisplayController> &blue_view) override;
 
-  void on_destroy_display() override;
+  void on_stop_display() override;
 
   ~BlueCallback() override;
 

@@ -157,11 +157,11 @@ void BlueCallback::on_characteristic_read(const std::shared_ptr<gen::BlueGatt> &
   });
 }
 
-void BlueCallback::on_create_main(
+void BlueCallback::on_start_main(
   const std::shared_ptr<gen::BlueViewMainController> &blue_view,
   const std::shared_ptr<gen::PermissionInterface> &permission_manager) {
 
-  log(gen::LogSeverity::DEBUG, "on_create_main");
+  log(gen::LogSeverity::DEBUG, "on_start_main");
 
   bluecast::log(gen::LogSeverity::DEBUG,
                 permission_manager->has(gen::Permission::BLUETOOTH) ? "bluetooth::true" : "bluetooth::false");
@@ -188,11 +188,11 @@ void BlueCallback::on_create_main(
   });
 }
 
-void BlueCallback::on_create_display(
+void BlueCallback::on_start_display(
   const gen::BlueDevice& device,
   const std::shared_ptr<gen::BlueViewDisplayController> &blue_view) {
 
-  log(gen::LogSeverity::DEBUG, "on_create_display");
+  log(gen::LogSeverity::DEBUG, "on_start_display");
 
   _view_display = { blue_view, device };
 
@@ -201,15 +201,15 @@ void BlueCallback::on_create_display(
   tasksDisplayView().push([device]() { blueManager()->connect_gatt(device); });
 }
 
-void BlueCallback::on_destroy_main() {
-  log(gen::LogSeverity::DEBUG, "on_destroy_main");
+void BlueCallback::on_stop_main() {
+  log(gen::LogSeverity::DEBUG, "on_stop_main");
 
   tasksMainView().clear();
   _view_main.controller.reset();
 }
 
-void BlueCallback::on_destroy_display() {
-  log(gen::LogSeverity::DEBUG, "on_destroy_display");
+void BlueCallback::on_stop_display() {
+  log(gen::LogSeverity::DEBUG, "on_stop_display");
 
   tasksDisplayView().clear();
   _view_display.controller.reset();
