@@ -1,6 +1,5 @@
 package com.loki.superglue.djinni.bluecast;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -12,8 +11,9 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.loki.superglue.djinni.bluecast.gatt.GattBind;
@@ -31,6 +31,7 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.service.ArmaRssiFilter;
 
@@ -52,8 +53,16 @@ public class Bluetooth extends BluetoothGattCallback {
 
     private Context context;
 
+    private NotificationCompat.Builder notification;
     public Bluetooth(Context context) {
         this.context = context;
+
+        notification = new NotificationCompat.Builder(context, BlueApplication.CHANNEL_ID)
+                .setContentTitle("Beacons detected")
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentText("You are in a region of beacons")
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         btAdap = BluetoothAdapter.getDefaultAdapter();
         scanCall = scanCallback();
@@ -171,8 +180,42 @@ public class Bluetooth extends BluetoothGattCallback {
 
     private BeaconConsumer beaconConsumerImpl() {
         return new BeaconConsumer() {
+            Region region = new Region("ibeacon", null, null, null);
+
             @Override
             public void onBeaconServiceConnect() {
+                beaconManager.addMonitorNotifier(new MonitorNotifier() {
+                    @Override
+                    public void didEnterRegion(Region region) {
+                        NotificationManagerCompat notifier = NotificationManagerCompat.from(context);
+
+                        notifier.notify(BlueApplication.NOTIFICATION_ID, notification.build());
+
+                        try {
+                            beaconManager.startRangingBeaconsInRegion(region);
+                        } catch (RemoteException e) {
+                            Log.w(TAG, e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void didExitRegion(Region region) {
+                        NotificationManagerCompat notifier = NotificationManagerCompat.from(context);
+
+                        notifier.cancel(BlueApplication.NOTIFICATION_ID);
+
+                        try {
+                            beaconManager.stopRangingBeaconsInRegion(region);
+                        } catch (RemoteException e) {
+                            Log.w(TAG, e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void didDetermineStateForRegion(int i, Region region) {}
+                });
                 beaconManager.addRangeNotifier((Collection<Beacon> beacons, Region region) -> {
                         for(Beacon beacon : beacons) {
                             UUID uuid = beacon.getId1().toUuid();
@@ -188,10 +231,9 @@ public class Bluetooth extends BluetoothGattCallback {
                         }
                 });
                 try {
-                    Region region = new Region("ibeacon", null, null, null);
-                    beaconManager.startRangingBeaconsInRegion(region);
+                    beaconManager.startMonitoringBeaconsInRegion(region);
                 } catch (RemoteException e) {
-                    Log.d(TAG, e.getMessage());
+                    Log.w(TAG, e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -203,6 +245,16 @@ public class Bluetooth extends BluetoothGattCallback {
 
             @Override
             public void unbindService(ServiceConnection serviceConnection) {
+                try {
+                    beaconManager.stopMonitoringBeaconsInRegion(region);
+                } catch (RemoteException e) {
+                    Log.w(TAG, e.getMessage());
+                    e.printStackTrace();
+                }
+
+                NotificationManagerCompat notifier = NotificationManagerCompat.from(context);
+                notifier.cancel(BlueApplication.NOTIFICATION_ID);
+
                 context.unbindService(serviceConnection);
             }
 
