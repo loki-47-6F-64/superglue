@@ -1,5 +1,5 @@
 project(SuperGlueJNI)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O2 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
@@ -35,7 +35,6 @@ SET_TARGET_PROPERTIES(superglue PROPERTIES LINK_FLAGS "-Wl,--no-undefined")
 TARGET_LINK_LIBRARIES(superglue
   superglueC
 )
-
 
 install(
   TARGETS superglue DESTINATION "${LIBS_ROOT}/${TARGET_ABI}"

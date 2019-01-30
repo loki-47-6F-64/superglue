@@ -81,6 +81,12 @@ else()
   message(FATAL_ERROR "Unknown platform: ${TARGET_PLATFORM}")
 endif()
 
+# If building for a console application, don't add install dependencies
+if(BUILD_CONSOLE_APP)
+  include(DownloadOpenSSL)
+  return()
+endif()
+
 include(ModuleInclude)
 
 if(BUILD_EXTERNAL_MULTI_ARCH)
