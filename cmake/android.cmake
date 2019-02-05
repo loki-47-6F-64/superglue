@@ -6,7 +6,7 @@
 #  message(FATAL_ERROR "TARGET_ABI is not defined")
 #endif()
 
-set(TARGET_PLATFORM_NR "21" CACHE STRING "")
+set(TARGET_PLATFORM_NR "28" CACHE STRING "")
 set(TARGET_ABI "" CACHE STRING "")
 
 file(GLOB TOOLCHAIN_ROOT "${TOOLCHAIN_ROOT}")
@@ -41,7 +41,7 @@ else()
 endif()
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -target ${NDK_COMPILER_TARGET}${TARGET_PLATFORM_NR} ${TARGET_ABI_FLAGS} -Wl,--gc-sections -Wl,--export-dynamic -pie -fPIE -Wl,--build-id -latomic -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel -Wl,--fatal-warnings -lm -rpath \"\$ORIGIN\"")
-set(ANDROID_FLAGS "-ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes -target ${NDK_COMPILER_TARGET}${TARGET_PLATFORM_NR} ${TARGET_ABI_FLAGS} -D__ANDROID_API__=${TARGET_PLATFORM_NR} -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fpic -DANDROID -pie -fPIE -Wa,--noexecstack -Wformat -Werror=format-security")
+set(ANDROID_FLAGS "-ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes -target ${NDK_COMPILER_TARGET}${TARGET_PLATFORM_NR} ${TARGET_ABI_FLAGS} -D__ANDROID_API__=${TARGET_PLATFORM_NR} -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fpic -DANDROID -pie -fPIE -fPIC -Wa,--noexecstack -Wformat -Werror=format-security")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ANDROID_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ANDROID_FLAGS}")
 
