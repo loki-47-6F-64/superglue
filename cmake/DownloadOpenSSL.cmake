@@ -10,8 +10,6 @@ add_library(download-ssl STATIC IMPORTED)
 
 set(OPENSSL_LIBRARIES download-ssl download-crypto)
 
-
-message("ANDROID_DEV=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr")
 if(${TARGET_PLATFORM} STREQUAL ANDROID)
   if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     if(${TARGET_ABI} STREQUAL "armeabi-v7a")
@@ -30,11 +28,11 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
       PATCH_COMMAND
         sed -i.back -e "s/\\-mandroid//g" Configurations/10-main.conf
       CONFIGURE_COMMAND
-        "CC=${CC}" "RANLIB=${RANLIB}" "AR=${AR}" "NM=${NM}" "./Configure" "${CONFIGURE_ABI}"
+      "CC=${CC}" "RANLIB=${RANLIB}" "AR=${AR}" "NM=${NM}" "./Configure" "${CONFIGURE_ABI}" "-I${CMAKE_FIND_ROOT_PATH}/include/${NDK_BINARY_PREFIX}" "-L${CMAKE_FIND_ROOT_PATH}/lib/${NDK_BINARY_PREFIX}/${TARGET_PLATFORM_NR}"
 
       BUILD_IN_SOURCE 1
       BUILD_COMMAND
-        "CROSS_SYSROOT=${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}/sysroot/usr" "make" "-j4" "build_libs"
+      "CROSS_SYSROOT=${CMAKE_FIND_ROOT_PATH}" "make" "build_libs"
       INSTALL_COMMAND ""
     )
 
@@ -45,7 +43,15 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
     )
 
     ExternalProject_Get_Property(OpenSSL binary_dir)
-    add_dependencies(download-crypto OpenSSL)
+    
+    set(COPY_FROM_DIR ${CMAKE_FIND_ROOT_PATH}/lib/${NDK_BINARY_PREFIX}/${TARGET_PLATFORM_NR})
+    ExternalProject_Add_Step(OpenSSL link-to-crt_so
+      COMMAND ${CMAKE_COMMAND} -E copy ${COPY_FROM_DIR}/crtbegin_so.o ${COPY_FROM_DIR}/crtend_so.o ${binary_dir}
+      DEPENDERS build
+      DEPENDEES configure
+      )
+
+      add_dependencies(download-crypto OpenSSL)
   endif()
 elseif(${TARGET_PLATFORM} STREQUAL IOS)
   set(binary_dir ${EXTERNAL_PROJECT_BINARY_DIR}/OpenSSL-prefix/src/Openssl)

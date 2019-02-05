@@ -1,13 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 if(BUILD_EXTERNAL_MULTI_ARCH)
   # No need for compilers in this mode
   project(SuperGlue NONE)
 else()
+  if(${TARGET_PLATFORM} STREQUAL ANDROID)
+    # fake toolchain file
+    include(android)
+  endif()
+
   project(SuperGlue)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(ExternalProject)
 
 # Download and build external projects.
@@ -31,16 +37,6 @@ if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     if(NOT DEFINED TARGET_ABI)
       message(FATAL_ERROR "TARGET_ABI is not defined")
     endif()
-  
-    if(${TARGET_ABI} STREQUAL "armeabi-v7a") 
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a")
-      set(CXX_SHARED "${CMAKE_CURRENT_SOURCE_DIR}/../output/armeabi-v7a/arm-linux-androideabi/lib/armv7-a/libc++_shared.so")
-    elseif(${TARGET_ABI} STREQUAL "x86")
-      set(CXX_SHARED "${CMAKE_CURRENT_SOURCE_DIR}/../output/x86/i686-linux-android/lib/libc++_shared.so")
-    endif()
-
-    if(${TARGET_ABI} STREQUAL "armeabi-v7a")
-          endif()
   
     add_subdirectory(kitty)
   

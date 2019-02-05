@@ -1,0 +1,3 @@
+[submodule "kitty"]
+	path = kitty
+	url = git@github.com:loki-47-6F-64/kitty.git

@@ -16,35 +16,37 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
   if(NOT BUILD_EXTERNAL_MULTI_ARCH)
     # Do something specific for the TARGET_ABI
     if(${TARGET_ABI} STREQUAL "armeabi-v7a")
-	set(MACHINE_NAME arm-unknown-linux-androideabi)
+	set(MACHINE_NAME arm-unknown-linux-android)
     elseif(${TARGET_ABI} STREQUAL "x86")
-	set(MACHINE_NAME )
+	set(MACHINE_NAME i686-pc-linux-android)
     else()
       message(FATAL_ERROR "pjsip: Unsupported target abi")
     endif()
 
-    set(MACHINE_NAME arm-unknown-linux-androideabi)
-    
     set(TOOLCHAIN_DIR "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}")
-    set(ANDROID_NDK_ROOT ${TOOLCHAIN_DIR}/../toolchain/android-ndk-r17c)
-
-    # Extract name host compiler
-    get_filename_component(HOST_COMPILER_CC ${CC} NAME)
-    string(REPLACE "-clang" "" ${HOST_COMPILER_CC} HOST_COMPILER)
+    file(GLOB ANDROID_NDK_ROOT ${TOOLCHAIN_DIR}/../toolchain/android-ndk-*)
 
     ExternalProject_Add(PJSIP
       BUILD_IN_SOURCE 1
       GIT_REPOSITORY "https://github.com/pjsip/pjproject.git"
       GIT_TAG "master"
       BUILD_COMMAND
-	"make" "-j4"
+	"make"
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
-      CONFIGURE_COMMAND	"ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}" "ANDROID_NDK_TOOLCHAIN=4.9" "TARGET_ABI=${TARGET_ABI}" "APP_PLATFORM=android-21" "./configure-android" "--use-ndk-cflags" COMMAND "make" "dep" "-j4"
-	
+      PATCH_COMMAND patch < "${PATCH_DIR}/configure-android.patch"
+      CONFIGURE_COMMAND
+      "CFLAGS=-g" "ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}" "TARGET_ABI=${TARGET_ABI}" "APP_PLATFORM=android-${TARGET_PLATFORM_NR}" "./configure-android"
+      COMMAND "make" "dep"
     )
 
     ExternalProject_Get_Property(PJSIP binary_dir)
+
+    ExternalProject_Add_Step(PJSIP config-site
+      COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/cmake/patch/pj_config_site.h ${binary_dir}/pjlib/include/pj/config_site.h
+      DEPENDERS configure
+      DEPENDEES patch
+      )
     add_dependencies(download-pjlib PJSIP)
   endif()
 elseif(${TARGET_PLATFORM} STREQUAL IOS)
@@ -63,6 +65,7 @@ else()
   message(FATAL_ERROR "Unknown platform ${TARGET_PLATFORM}")
 endif()
 
+message("${binary_dir}/pjnath/lib/libpjnath-${MACHINE_NAME}.a")
 # Let cmake know where to find the library
 set_property(TARGET download-pjnath PROPERTY IMPORTED_LOCATION "${binary_dir}/pjnath/lib/libpjnath-${MACHINE_NAME}.a")
 set_property(TARGET download-pjlib-util PROPERTY IMPORTED_LOCATION "${binary_dir}/pjlib-util/lib/libpjlib-util-${MACHINE_NAME}.a")
@@ -76,6 +79,14 @@ set(PJSIP_INCLUDE_DIRS
 
 add_dependencies(download-pjlib-util download-pjlib)
 add_dependencies(download-pjnath download-pjlib-util)
+
+file(GLOB_RECURSE WRAPPER_SOURCES_PJSIP
+  "${CMAKE_CURRENT_SOURCE_DIR}/wrappers/pjsip/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/wrappers/pjsip/*.hpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/wrappers/pjsip/*.h"
+  )
+list(APPEND WRAPPER_SOURCES ${WRAPPER_SOURCES_PJSIP})
+list(APPEND PJSIP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/wrappers/pjsip)
 
 # Let src/CMakeLists.txt know what dependecies to include
 list(APPEND HEADER_INCLUDE_DIRS ${PJSIP_INCLUDE_DIRS})
