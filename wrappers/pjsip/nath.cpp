@@ -9,6 +9,7 @@
 #include "pool.h"
 
 #include <kitty/util/optional.h>
+#include <kitty/log/log.h>
 
 namespace pj {
 
@@ -17,16 +18,42 @@ Pool pool;
 
 
 // log callback to write to file
-// TODO: define log_func
-//static void log_func(int level, const char *data, int len) {
-//
-//}
+static void log_func(int level, const char *data, int len) {
+  std::string_view str { data, (std::size_t)len };
+
+  if(str.back() == '\n') {
+    str.remove_suffix(1);
+  }
+
+  switch (level) {
+    case 0:
+      print(error, "FATAL --> aborting... ", str);
+      std::abort();
+    case 1:
+      print(info, str);
+      break;
+    case 2:
+      print(info, str);
+      break;
+    case 3:
+      print(info, str);
+      break;
+    case 4:
+      print(info, str);
+      break;
+    case 5:
+      print(debug, str);
+      break;
+  }
+}
 
 status_t init(util::Optional<std::string_view> logFile) {
   pj_log_set_level(5);
   if(logFile) {
     pj_log_set_log_func(&pj_log_write);
   }
+
+  pj_log_set_log_func(&log_func);
 
   if(auto status = pj_init()) {
     return status;

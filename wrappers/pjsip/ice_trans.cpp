@@ -98,7 +98,7 @@ creds_t ICETrans::credentials() {
 
 std::vector<ice_sess_cand_t> ICETrans::get_candidates(unsigned int comp_cnt) {
   ice_sess_cand_t cand[ICE_MAX_CAND];
-  unsigned count;
+  unsigned count = ICE_MAX_CAND;
 
   pj_ice_strans_enum_cands(_ice_trans.get(), comp_cnt +1, &count, cand);
 

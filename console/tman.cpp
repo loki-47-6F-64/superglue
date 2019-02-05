@@ -11,13 +11,11 @@
 #include "pool.h"
 #include "pack.h"
 
-#include <dlfcn.h>
 #include <jni.h>
+#include <dlfcn.h>
 
+#include "vm.h"
 JavaVM *pj_jni_jvm { nullptr };
-
-typedef int (*JNI_CreateJavaVM_t)(void *, void *, void *);
-typedef jint (*registerNatives_t)(JNIEnv* env, jclass clazz);
 
 int distance(const int &l, const int &r) {
   return r - l;
@@ -63,46 +61,78 @@ void jvm_destroy(JavaVM *jvm) {
   jvm->DestroyJavaVM();
 }
 
-int main(int argc, char* argv[]) {
-  auto libandroid_runtime_dso = dlopen("libandroid_runtime.so", RTLD_NOW);
-  auto libart = dlopen("libart.so", RTLD_NOW);
+class except_t {
+public:
+  std::string_view name;
+  std::string_view message;
 
-  if(!(libandroid_runtime_dso && libart)) {
-    std::cerr << "cannot load [libandroid_runtime_dso] || [libart.so]" << std::endl;
+  except_t() = default;
 
-    return 120;
+  except_t(const std::string_view &name, const std::string_view &message, const std::tuple<JNIEnv*, jstring, jstring> &env) :
+    name(name), message(message), _env(env) {}
+
+  except_t(except_t &&other) {
+    _env = other._env;
+    other._env = {nullptr, nullptr, nullptr};
   }
 
-  
-  auto JNI_CreateJavaVM = (JNI_CreateJavaVM_t) dlsym(libart, "JNI_CreateJavaVM");
-  
+  except_t &operator=(except_t &&other) {
+    std::swap(_env, other._env);
+    std::swap(name, other.name);
+    std::swap(message, other.message);
 
-  std::cout << "hello world!" << std::endl;
-  JNIEnv *env { nullptr };
-
-  JavaVMInitArgs vm_args;
-  JavaVMOption jvmopt[4];
-  jvmopt[0].optionString = "-Djava.class.path=/data/local/tmp/target-app.apk";
-  jvmopt[1].optionString = "-agentlib:jdwp=transport=dt_android_adb,suspend=n,server=y";
-  jvmopt[2].optionString = "-Djava.library.path=/data/local/tmp";
-  jvmopt[3].optionString = "-verbose:jni"; // may want to remove this, it's noisy
-
-  //JNI_GetDefaultJavaVMInitArgs(&vm_args);
-  vm_args.nOptions = 4;
-  vm_args.ignoreUnrecognized = JNI_FALSE;
-  vm_args.version = JNI_VERSION_1_6;
-  vm_args.options = jvmopt;
-
-  
-  std::cout << "hello world!" << std::endl;
+    return *this;
+  }
 
 
-  JNI_CreateJavaVM(&pj_jni_jvm, &env, &vm_args);
+  ~except_t() {
+    if(std::get<0>(_env)) {
+      std::get<0>(_env)->ReleaseStringUTFChars(std::get<1>(_env), name.data());
+      std::get<0>(_env)->ReleaseStringUTFChars(std::get<2>(_env), message.data());
+    }
+  }
 
-  std::cout << "hello world!" << std::endl;
+private:
+  std::tuple<JNIEnv*, jstring, jstring> _env = {nullptr, nullptr, nullptr};
+};
 
-  util::safe_ptr<JavaVM, jvm_destroy> jvm(pj_jni_jvm);
+except_t get_message(JNIEnv *env, jthrowable except) {
+  env->ExceptionClear();
 
+  auto except_class = env->GetObjectClass(except);
+  auto class_       = env->FindClass("java/lang/Class");
+
+  auto get_name    = env->GetMethodID(class_, "getName", "()Ljava/lang/String;");
+  auto get_message = env->GetMethodID(except_class, "getMessage", "()Ljava/lang/String;");
+
+  auto jname    = (jstring)env->CallObjectMethod(except_class, get_name);
+  auto jmessage = (jstring)env->CallObjectMethod(except, get_message);
+
+
+  auto message = env->GetStringUTFChars(jmessage, 0);
+  auto name    = env->GetStringUTFChars(jname, 0);
+
+  return {
+    {name},
+    {message},
+    {env,jname,jmessage}
+  };
+}
+
+void handle_exception(JNIEnv *jni_env) {
+  if(auto exception = jni_env->ExceptionOccurred()) {
+    auto ex = get_message(jni_env, exception);
+  }
+  else {
+    print(error, "no exception :|");
+  }
+}
+
+int main(int argc, char* argv[]) {
+  JNIEnv *jni_env { nullptr };
+  util::safe_ptr<JavaVM, jvm_destroy> jvm {
+    init_jvm(&pj_jni_jvm, &jni_env)
+  };
 
   pj::init(nullptr);
 
@@ -117,6 +147,7 @@ int main(int argc, char* argv[]) {
     auto thread_ptr = pj::register_thread();
 
     auto_run.run([&pool]() {
+
       std::chrono::milliseconds max_tm { 500 };
       std::chrono::milliseconds milli { 0 };
 
@@ -127,28 +158,30 @@ int main(int argc, char* argv[]) {
       auto c = pool.io_queue().poll(milli);
       if(c < 0) {
         std::cerr << __FILE__ "::" << pj::err(pj::get_netos_err());
+
+        std::abort();
       }
     });
   });
 
   auto ice_trans = pool.ice_trans(on_data, on_ice_compl, on_call_connect);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   ice_trans.init_ice();
-
 
 
   auto json = pack({ ice_trans.credentials(), ice_trans.get_candidates() });
   auto str = json->dump();
 
-  auto client = file::connect("localhost", "2345");
+  auto client = file::connect("192.168.0.115", "2345");
 
   if(!client.is_open()) {
-    print(error, "Could not connect to localhost:2345 :: ", err::current());
+    print(error, "Could not connect to 192.168.0.115:2345 :: ", err::current());
 
     return 7;
   }
 
+  print(info, "Connected to 192.168.0.115:2345");
   util::append_struct(client.get_write_cache(), util::endian::little((std::uint16_t)str.size()));
   _print(client, str);
 
@@ -250,16 +283,3 @@ int main() {
   return 0;
 }
  */
-
-// linker flags needed :: -Wl,--export-dynamic
-// Include all of the Android's libsigchain symbols
-// libsigchain calls abort()
-extern "C" {
-JNIEXPORT void InitializeSignalChain() {}
-JNIEXPORT void ClaimSignalChain() {}
-JNIEXPORT void UnclaimSignalChain() {}
-JNIEXPORT void InvokeUserSignalHandler() {}
-JNIEXPORT void EnsureFrontOfChain() {}
-JNIEXPORT void AddSpecialSignalHandlerFn() {}
-JNIEXPORT void RemoveSpecialSignalHandlerFn() {}
-}
