@@ -26,7 +26,7 @@ JavaVM *init_jvm(JavaVM **p_vm, JNIEnv **p_env) {
   JavaVMOption opt[4];
   opt[0].optionString = "-Djava.class.path=/data/local/tmp/target-app.apk";
   opt[1].optionString = "-agentlib:jdwp=transport=dt_android_adb,suspend=n,server=y";
-  opt[2].optionString = "-Djava.library.path=/data/local/tmp:/system/lib";
+  opt[2].optionString = "-Djava.library.path=/data/local/tmp:/system/lib:/system/lib64";
   opt[3].optionString = "-verbose:jni"; // may want to remove this, it's noisy
 
   // Add this option if you're hacking stuff and need it, not normally required

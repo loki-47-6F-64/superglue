@@ -11,51 +11,12 @@
 #include "pool.h"
 #include "pack.h"
 
-#include <jni.h>
 #include <dlfcn.h>
 
+#ifdef ANDROID
+#include <jni.h>
 #include "vm.h"
 JavaVM *pj_jni_jvm { nullptr };
-
-int distance(const int &l, const int &r) {
-  return r - l;
-}
-
-void print_tman(const TMan<int> &tman) {
-  std::cout << tman.get_descr().rank << ' ';
-
-  auto peers = tman.get_peers();
-  auto it = std::begin(peers);
-
-  while(it != std::end(peers) && tman.get_descr().rank > it->rank) {
-    ++it;
-  }
-
-  if(it == std::end(peers)) {
-    return;
-  }
-
-  print_tman(*it->address);
-};
-
-void tmans_iterate(std::vector<TMan<int>> &tmans) {
-  for(auto & tman : tmans) {
-    tman.iterate();
-    tman.rand_iterate();
-  }
-}
-
-auto on_data = [](pj::ICECall call, std::string_view data) noexcept {
-  std::cout << call.ip_addr.ip << ":" << call.ip_addr.port << " [><] " << data << std::endl;
-};
-
-auto on_ice_compl = [](pj::ice_trans_op_t op, pj::status_t status) noexcept {};
-
-auto on_call_connect = [](pj::ICECall call) {
-  print(debug, "<<<<<<<<<<<<<<<<<<<<< sending data >>>>>>>>>>>>>>>>>>>>>>>");
-
-  call.send(util::toContainer("Hello peer!"));
-};
 
 void jvm_destroy(JavaVM *jvm) {
   jvm->DestroyJavaVM();
@@ -128,12 +89,68 @@ void handle_exception(JNIEnv *jni_env) {
   }
 }
 
+#endif
+
+int distance(const int &l, const int &r) {
+  return r - l;
+}
+
+void print_tman(const TMan<int> &tman) {
+  std::cout << tman.get_descr().rank << ' ';
+
+  auto peers = tman.get_peers();
+  auto it = std::begin(peers);
+
+  while(it != std::end(peers) && tman.get_descr().rank > it->rank) {
+    ++it;
+  }
+
+  if(it == std::end(peers)) {
+    return;
+  }
+
+  print_tman(*it->address);
+};
+
+void tmans_iterate(std::vector<TMan<int>> &tmans) {
+  for(auto & tman : tmans) {
+    tman.iterate();
+    tman.rand_iterate();
+  }
+}
+
+auto on_data = [](pj::ICECall call, std::string_view data) {
+  print(debug, call.ip_addr.ip, ":", call.ip_addr.port, " [><] ", data);
+};
+
+auto on_ice_compl = [](pj::ice_trans_op_t op, pj::status_t status) {};
+
+auto on_call_connect = [](pj::ICECall call) {
+  print(debug, "<<<<<<<<<<<<<<<<<<<<< sending data >>>>>>>>>>>>>>>>>>>>>>>");
+
+  call.send(util::toContainer("Hello peer!"));
+};
+
+
+
 int main(int argc, char* argv[]) {
+#ifdef ANDROID
   JNIEnv *jni_env { nullptr };
   util::safe_ptr<JavaVM, jvm_destroy> jvm {
     init_jvm(&pj_jni_jvm, &jni_env)
   };
+#endif
+  const char *hostname = "192.168.0.115";
+  const char *port     = "2345";
 
+  if(argc > 1) {
+    hostname = argv[1];
+    if(argc > 2) {
+      port = argv[2];
+    }
+  }
+
+  print(info, hostname, ':', port);
   pj::init(nullptr);
 
   pj::Pool pool("Loki-ICE");
@@ -166,34 +183,52 @@ int main(int argc, char* argv[]) {
 
   auto ice_trans = pool.ice_trans(on_data, on_ice_compl, on_call_connect);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   ice_trans.init_ice();
 
+  auto candidates = ice_trans.get_candidates();
+  for(auto &candidate : candidates) {
+    std::vector<char> buf;
+    print(info, "candidate: ", pj::ip_addr_t::from_sockaddr_t(buf, &candidate.addr).ip, " <> ", candidate.prio);
+  }
 
-  auto json = pack({ ice_trans.credentials(), ice_trans.get_candidates() });
+  auto json = pack({ ice_trans.credentials(), std::move(candidates) });
   auto str = json->dump();
 
-  auto client = file::connect("192.168.0.115", "2345");
+  auto client = file::connect(hostname, port);
 
   if(!client.is_open()) {
-    print(error, "Could not connect to 192.168.0.115:2345 :: ", err::current());
+    print(error, "Could not connect to ", hostname, ":", port, " :: ", err::current());
 
     return 7;
   }
 
-  print(info, "Connected to 192.168.0.115:2345");
+  print(info, "Connected to ", hostname, ":", port);
   util::append_struct(client.get_write_cache(), util::endian::little((std::uint16_t)str.size()));
   _print(client, str);
 
 
   auto size = util::endian::little(*util::read_struct<std::uint16_t>(client));
 
+  std::size_t us = 0;
   if(size <= 2) {
-    client.seal();
+    us = 1;
+    client.copy(info, size);
 
-    worker_thread.join();
+    while(client.is_open()) {
+      if(auto optional_size = util::read_struct<std::uint16_t>(client)) {
+        size = util::endian::little(*optional_size);
 
-    return 0;
+        print(debug, "size =============== ", size);
+        break;
+      }
+    }
+
+    if(!client.is_open()) {
+      print(error, "server closed connection :: ", err::current());
+
+      return -1;
+    }
   }
 
   str.clear();
@@ -207,8 +242,17 @@ int main(int argc, char* argv[]) {
   print(info, "-------------------------- ", str);
   auto remote = unpack(nlohmann::json::parse(str));
 
-  ice_trans.set_role(pj::ice_sess_role_t::PJ_ICE_SESS_ROLE_CONTROLLING);
-  auto err_code = ice_trans.start_ice(*remote);
+  if(!us) {
+    ice_trans.set_role(pj::ice_sess_role_t::PJ_ICE_SESS_ROLE_CONTROLLING);
+  }
+
+
+  for(auto &candidate : remote->operator[](us).candidates) {
+    std::vector<char> buf;
+    print(info, "candidate: ", pj::ip_addr_t::from_sockaddr_t(buf, &candidate.addr).ip, " <> ", candidate.prio);
+  }
+
+  auto err_code = ice_trans.start_ice((*remote)[us]);
   if(err_code) {
     print(error, err::current());
 

@@ -19,12 +19,11 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
 	set(MACHINE_NAME arm-unknown-linux-android)
     elseif(${TARGET_ABI} STREQUAL "x86")
 	set(MACHINE_NAME i686-pc-linux-android)
+      elseif(${TARGET_ABI} STREQUAL "arm64-v8a")
+        set(MACHINE_NAME aarch64-unknown-linux-android)
     else()
       message(FATAL_ERROR "pjsip: Unsupported target abi")
     endif()
-
-    set(TOOLCHAIN_DIR "${PROJECT_SOURCE_DIR}/output/${TARGET_ABI}")
-    file(GLOB ANDROID_NDK_ROOT ${TOOLCHAIN_DIR}/../toolchain/android-ndk-*)
 
     ExternalProject_Add(PJSIP
       BUILD_IN_SOURCE 1
@@ -44,6 +43,7 @@ if(${TARGET_PLATFORM} STREQUAL ANDROID)
 
     ExternalProject_Add_Step(PJSIP config-site
       COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/cmake/patch/pj_config_site.h ${binary_dir}/pjlib/include/pj/config_site.h
+      COMMAND patch "-d${binary_dir}/pjlib/include/pj/" < "${PATCH_DIR}/pj_config.patch"
       DEPENDERS configure
       DEPENDEES patch
       )

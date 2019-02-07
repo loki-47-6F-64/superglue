@@ -9,6 +9,6 @@
 #include <ice_trans.h>
 
 std::optional<nlohmann::json> pack(const pj::remote_t &remote);
-std::optional<pj::remote_buf_t> unpack(const nlohmann::json &json);
+std::optional<std::vector<pj::remote_buf_t>> unpack(const nlohmann::json &json);
 
 #endif //T_MAN_PACK_H
