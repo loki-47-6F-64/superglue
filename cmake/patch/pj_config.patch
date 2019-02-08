@@ -1,0 +1,26 @@
+diff --git a/config.h b/config.h
+index 7ffe4e63..4c455b5a 100644
+--- a/config.h
++++ b/config.h
+@@ -273,6 +273,21 @@
+ #	define PJ_M_NAME		"armv4"
+ #   endif 
+ 
++#elif defined(__ARM_ARCH_ISA_A64) || defined(__aarch64__)
++#   define PJ_HAS_PENTIUM	0
++    /*
++     * ARM, bi-endian, so raise error if endianness is not configured
++     */
++#   if !PJ_IS_LITTLE_ENDIAN && !PJ_IS_BIG_ENDIAN
++#   	error Endianness must be declared for this processor
++#   endif
++#   if defined(PJ_M_ARM64)
++#     undef PJ_M_ARM64
++#   endif
++#   define PJ_M_ARM64		1
++#   define PJ_M_NAME		"armv64"
++
++
+ #elif defined (PJ_M_POWERPC) || defined(__powerpc) || defined(__powerpc__) || \
+ 	defined(__POWERPC__) || defined(__ppc__) || defined(_M_PPC) || \
+ 	defined(_ARCH_PPC)
