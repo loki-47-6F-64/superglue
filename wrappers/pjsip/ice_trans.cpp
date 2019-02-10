@@ -2,6 +2,9 @@
 // Created by loki on 25-1-19.
 //
 
+#include <kitty/err/err.h>
+#include <kitty/log/log.h>
+
 #include "ice_trans.h"
 
 namespace pj {
@@ -39,11 +42,11 @@ void cb_on_rx_data(pj_ice_strans *ice_st,
  * receive notification about ICE state progression.
  */
 void cb_on_ice_complete(pj_ice_strans *ice_st,
-                               pj_ice_strans_op op,
-                               pj_status_t status) {
+                               ice_trans_op_t op,
+                               status_t status) {
   auto &funcs = from_userdata(ice_st);
 
-  if(op == pj::ice_trans_op_t::PJ_ICE_STRANS_OP_NEGOTIATION && status == pj::success) {
+  if(op == pj::ice_trans_op_t::PJ_ICE_STRANS_OP_NEGOTIATION) {
     ice_sess_cand_t cand;
 
     pj_ice_strans_get_def_cand(ice_st, 1, &cand);
@@ -53,12 +56,29 @@ void cb_on_ice_complete(pj_ice_strans *ice_st,
       ice_st, {
         ip_addr_t::from_sockaddr_t(buf, &cand.addr)
       }
-    });
+    }, status);
 
     return;
   }
 
-  std::get<1>(funcs)(op, status);
+  if(op == pj::ice_trans_op_t::PJ_ICE_STRANS_OP_INIT) {
+    ice_sess_cand_t cand;
+
+    pj_ice_strans_get_def_cand(ice_st, 1, &cand);
+
+    std::vector<char> buf;
+    std::get<1>(funcs)({
+      ice_st, {
+        ip_addr_t::from_sockaddr_t(buf, &cand.addr)
+      }
+    }, status);
+
+    return;
+  }
+
+  auto *state_name = op == PJ_ICE_STRANS_OP_KEEP_ALIVE ? "ICE_STRANS_OP_KEEP_ALIVE" : "ICE_STRANS_OP_ADDR_CHANGE";
+
+  print(warning, "unhandled state change [", state_name, ":", status == success ? "success" : "fail");
 }
 
 constexpr ice_trans_cb_t ice_trans_cb {
@@ -75,12 +95,8 @@ ICETrans::ICETrans(const ice_trans_cfg_t &ice_trans_cfg, func_t &&callbacks) : _
   _ice_trans.reset(ptr);
 }
 
-bool ICETrans::has_session() const {
-  return (bool) pj_ice_strans_has_sess(_ice_trans.get());
-}
-
 status_t ICETrans::init_ice(pj::ice_sess_role_t role) {
-  if(has_session()) {
+  if(get_state().has_session()) {
     return success;
   }
 
@@ -132,6 +148,16 @@ status_t ICETrans::end_call() {
   return init_ice();
 }
 
+status_t ICETrans::end_session() {
+  return pj_ice_strans_destroy(_ice_trans.get());
+}
+
+ICEState ICETrans::get_state() const {
+  return ICEState {
+    pj_ice_strans_get_state(_ice_trans.get())
+  };
+}
+
 ip_addr_t ip_addr_t::from_sockaddr_t(std::vector<char> &buf, const sockaddr_t *const ip_addr) {
   buf.resize(INET6_ADDR_STRING_LEN);
   pj_sockaddr_print(ip_addr, buf.data(), (int)buf.size(), 0);\
@@ -162,10 +188,76 @@ status_t ICECall::end_call() {
   return pj_ice_strans_init_ice(_ice_trans, ice_sess_role_t::PJ_ICE_SESS_ROLE_CONTROLLED, nullptr, nullptr);
 }
 
+status_t ICECall::set_role(ice_sess_role_t role) {
+  return pj_ice_strans_change_role(_ice_trans, role);
+}
+
+status_t ICECall::start_ice(const remote_t &remote) {
+  return _start_ice(_ice_trans, remote.creds, remote.candidates);
+}
+
+status_t ICECall::start_ice(const remote_buf_t &remote) {
+  return _start_ice(_ice_trans, remote.creds, remote.candidates);
+}
+
+creds_t ICECall::credentials() {
+  str_t ufrag;
+  str_t passwd;
+
+  pj_ice_strans_get_ufrag_pwd(_ice_trans, &ufrag, &passwd, nullptr, nullptr);
+
+  return creds_t { string(ufrag), string(passwd) };
+}
+
+std::vector<ice_sess_cand_t> ICECall::get_candidates(unsigned int comp_cnt) {
+  ice_sess_cand_t cand[ICE_MAX_CAND];
+  unsigned count;
+
+  pj_ice_strans_enum_cands(_ice_trans, comp_cnt +1, &count, cand);
+
+  return { cand, cand + count };
+}
+
+ICEState ICECall::get_state() const {
+  return ICEState {
+    pj_ice_strans_get_state(_ice_trans)
+  };
+}
+
 creds_buf_t::operator creds_t() const {
   return creds_t {
     ufrag,
     passwd
   };
 }
+
+bool ICEState::created() const {
+  return !(_state == ice_trans_state_t::PJ_ICE_STRANS_STATE_NULL);
+}
+
+bool ICEState::initializing() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_INIT;
+}
+
+bool ICEState::initialized() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_READY;
+}
+
+bool ICEState::has_session() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_SESS_READY;
+}
+
+bool ICEState::connecting() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_NEGO;
+}
+
+bool ICEState::connected() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_RUNNING;
+}
+
+bool ICEState::failed() const {
+  return _state == ice_trans_state_t::PJ_ICE_STRANS_STATE_FAILED;
+}
+
+ICEState::ICEState(pj_ice_strans_state state) : _state(state) {}
 }

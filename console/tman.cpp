@@ -11,9 +11,10 @@
 #include "pool.h"
 #include "pack.h"
 
-#include <dlfcn.h>
+#include "quest.h"
 
 #ifdef ANDROID
+#include <dlfcn.h>
 #include <jni.h>
 #include "vm.h"
 JavaVM *pj_jni_jvm { nullptr };
@@ -91,6 +92,14 @@ void handle_exception(JNIEnv *jni_env) {
 
 #endif
 
+using namespace std::chrono_literals;
+
+struct {
+  file::io server;
+  const char *hostname;
+  const char *port;
+} config;
+
 int distance(const int &l, const int &r) {
   return r - l;
 }
@@ -123,15 +132,41 @@ auto on_data = [](pj::ICECall call, std::string_view data) {
   print(debug, call.ip_addr.ip, ":", call.ip_addr.port, " [><] ", data);
 };
 
-auto on_ice_compl = [](pj::ice_trans_op_t op, pj::status_t status) {};
+auto on_ice_init = [](pj::ICECall call, pj::status_t status) {
+  if(status != pj::success) {
+    print(error, "failed initialization");
 
-auto on_call_connect = [](pj::ICECall call) {
+    return;
+  }
+
+  auto &server = config.server;
+
+  // TODO initialize call/negotiation
+  server = file::connect(config.hostname, config.port);
+  if(!server.is_open()) {
+    print(error, "Could not connect to ", config.hostname, ":", config.port , " :: ", err::current());
+
+    return;
+  }
+
+  print(server, file::raw(util::endian::little(uuid())));
+
+  send_register(server);
+
+  poll().read(server, {});
+};
+
+auto on_call_connect = [](pj::ICECall call, pj::status_t status) {
+  if(status != pj::success) {
+    print(error, "failed negotiation");
+
+    return;
+  }
+
   print(debug, "<<<<<<<<<<<<<<<<<<<<< sending data >>>>>>>>>>>>>>>>>>>>>>>");
 
   call.send(util::toContainer("Hello peer!"));
 };
-
-
 
 int main(int argc, char* argv[]) {
 #ifdef ANDROID
@@ -140,19 +175,20 @@ int main(int argc, char* argv[]) {
     init_jvm(&pj_jni_jvm, &jni_env)
   };
 #endif
-  const char *hostname = "192.168.0.115";
-  const char *port     = "2345";
+  config.hostname = "192.168.0.115";
+  config.port     = "2345";
 
   if(argc > 1) {
-    hostname = argv[1];
+    config.hostname = argv[1];
     if(argc > 2) {
-      port = argv[2];
+      config.port = argv[2];
     }
   }
 
-  print(info, hostname, ':', port);
+  print(info, config.hostname, ':', config.port);
   pj::init(nullptr);
 
+  auto pj_t = pj::register_thread();
   pj::Pool pool("Loki-ICE");
 
   pool.dns_resolv().set_ns({ "8.8.8.8" });
@@ -181,86 +217,14 @@ int main(int argc, char* argv[]) {
     });
   });
 
-  auto ice_trans = pool.ice_trans(on_data, on_ice_compl, on_call_connect);
+  ice_trans() = pool.ice_trans(on_data, on_ice_init, on_call_connect);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  ice_trans.init_ice();
-
-  auto candidates = ice_trans.get_candidates();
-  for(auto &candidate : candidates) {
-    std::vector<char> buf;
-    print(info, "candidate: ", pj::ip_addr_t::from_sockaddr_t(buf, &candidate.addr).ip, " <> ", candidate.prio);
+  while(true) {
+    poll().poll(50ms);
   }
 
-  auto json = pack({ ice_trans.credentials(), std::move(candidates) });
-  auto str = json->dump();
-
-  auto client = file::connect(hostname, port);
-
-  if(!client.is_open()) {
-    print(error, "Could not connect to ", hostname, ":", port, " :: ", err::current());
-
-    return 7;
-  }
-
-  print(info, "Connected to ", hostname, ":", port);
-  util::append_struct(client.get_write_cache(), util::endian::little((std::uint16_t)str.size()));
-  _print(client, str);
-
-
-  auto size = util::endian::little(*util::read_struct<std::uint16_t>(client));
-
-  std::size_t us = 0;
-  if(size <= 2) {
-    us = 1;
-    client.copy(info, size);
-
-    while(client.is_open()) {
-      if(auto optional_size = util::read_struct<std::uint16_t>(client)) {
-        size = util::endian::little(*optional_size);
-
-        print(debug, "size =============== ", size);
-        break;
-      }
-    }
-
-    if(!client.is_open()) {
-      print(error, "server closed connection :: ", err::current());
-
-      return -1;
-    }
-  }
-
-  str.clear();
-  str.reserve(size);
-  client.eachByte([&str](auto byte) {
-    str += byte;
-
-    return err::OK;
-    }, size);
-
-  print(info, "-------------------------- ", str);
-  auto remote = unpack(nlohmann::json::parse(str));
-
-  if(!us) {
-    ice_trans.set_role(pj::ice_sess_role_t::PJ_ICE_SESS_ROLE_CONTROLLING);
-  }
-
-
-  for(auto &candidate : remote->operator[](us).candidates) {
-    std::vector<char> buf;
-    print(info, "candidate: ", pj::ip_addr_t::from_sockaddr_t(buf, &candidate.addr).ip, " <> ", candidate.prio);
-  }
-
-  auto err_code = ice_trans.start_ice((*remote)[us]);
-  if(err_code) {
-    print(error, err::current());
-
-    auto_run.stop();
-    worker_thread.join();
-
-    return 7;
-  }
+  ice_trans() = pj::ICETrans();
+  auto_run.stop();
   worker_thread.join();
   return 0;
 }

@@ -26,8 +26,8 @@ public:
   void set_stun(ip_addr_t ip_addr);
 
   ICETrans ice_trans(std::function<void(ICECall, std::string_view)> &&on_data_recv,
-                     std::function<void(ice_trans_op_t, status_t)> &&on_ice_complete,
-                     std::function<void(ICECall)> &&on_call_connect);
+                     std::function<void(ICECall, status_t)> &&on_ice_init,
+                     std::function<void(ICECall, status_t)> &&on_call_connect);
 
 
 private:

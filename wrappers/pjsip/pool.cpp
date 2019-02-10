@@ -2,6 +2,8 @@
 // Created by loki on 24-1-19.
 //
 
+#include <mutex>
+
 #include "pool.h"
 
 namespace pj {
@@ -15,6 +17,7 @@ Pool::Pool(const char *name) {
     caching_pool.reset(&caching_pool_raw);
   });
 
+  _ice_cfg.turn_tp->conn_type = PJ_TURN_TP_TCP;
   pj_ice_strans_cfg_default(&_ice_cfg);
 
   _ice_cfg.af = pj_AF_INET();
@@ -36,11 +39,11 @@ IOQueue &Pool::io_queue() {
 }
 
 ICETrans Pool::ice_trans(std::function<void(ICECall, std::string_view)> &&on_data_recv,
-                         std::function<void(ice_trans_op_t, status_t)> &&on_ice_complete,
-                         std::function<void(ICECall)> &&on_call_connect) {
+                         std::function<void(ICECall, status_t)> &&on_ice_init,
+                         std::function<void(ICECall, status_t)> &&on_call_connect) {
   return pj::ICETrans {
     _ice_cfg,
-    std::make_unique<ICETrans::func_t::element_type>(std::make_tuple(std::move(on_data_recv), std::move(on_ice_complete), std::move(on_call_connect)))
+    std::make_unique<ICETrans::func_t::element_type>(std::make_tuple(std::move(on_data_recv), std::move(on_ice_init), std::move(on_call_connect)))
   };
 }
 

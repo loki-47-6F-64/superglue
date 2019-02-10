@@ -47,6 +47,17 @@ static void log_func(int level, const char *data, int len) {
   }
 }
 
+thread_t register_thread() {
+  auto desc = std::make_unique<std::array<long, THREAD_DESC_SIZE>>();
+
+  pj_thread_t *thread_raw;
+  pj_thread_register(nullptr, desc->data(), &thread_raw);
+  return thread_t {
+    std::move(desc),
+    thread_ptr { thread_raw }
+  };
+}
+
 status_t init(util::Optional<std::string_view> logFile) {
   pj_log_set_level(5);
   if(logFile) {
@@ -67,17 +78,6 @@ status_t init(util::Optional<std::string_view> logFile) {
     return status;
   }
   return success;
-}
-
-thread_t register_thread() {
-  auto desc = std::make_unique<std::array<long, THREAD_DESC_SIZE>>();
-
-  pj_thread_t *thread_raw;
-  pj_thread_register(nullptr, desc->data(), &thread_raw);
-  return thread_t {
-    std::move(desc),
-    thread_ptr { thread_raw }
-  };
 }
 
 str_t string(const std::string_view &str) {

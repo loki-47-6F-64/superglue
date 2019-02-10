@@ -5,10 +5,16 @@
 #ifndef T_MAN_NATH_H
 #define T_MAN_NATH_H
 
+#ifdef ANDROID
 #include <pj/config_site.h>
+#endif
+
+#include <chrono>
+
 #include <pjlib.h>
 #include <pjlib-util.h>
 #include <pjnath.h>
+
 #include <kitty/util/utility.h>
 
 namespace pj {
@@ -56,7 +62,7 @@ std::string_view string(const str_t &str);
 
 template<class T1, class T2>
 time_val_t time(const std::chrono::duration<T1,T2> &duration) {
-  return { 0, static_cast<ssize_t>(std::chrono::ceil<std::chrono::milliseconds>(duration).count()) };
+  return { 0, (long)std::chrono::ceil<std::chrono::milliseconds>(duration).count() };
 }
 
 std::chrono::milliseconds time(const time_val_t& duration);

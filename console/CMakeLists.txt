@@ -10,7 +10,7 @@ include_directories(
   ${KITTY_INCLUDE_DIRS}
 )
 
-add_executable(tman ${WRAPPER_SOURCES} ${C_SOURCES} ${CPP_SOURCES} pack.cpp pack.h tman.cpp TMan.h vm.h vm.c)
+add_executable(tman ${WRAPPER_SOURCES} ${C_SOURCES} ${CPP_SOURCES} pack.cpp pack.h tman.cpp TMan.h vm.h vm.c uuid.h quest.cpp quest.h)
 # Check for missing symbols during linking
 #SET_TARGET_PROPERTIES(tman PROPERTIES LINK_FLAGS "-pie -rpath '\\$ORIGIN'"")
 ###################################################################

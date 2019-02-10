@@ -2,6 +2,8 @@
 // Created by loki on 29-1-19.
 //
 
+#include <kitty/err/err.h>
+
 #include "pack.h"
 
 std::optional<nlohmann::json> pack_candidate(const pj::ice_sess_cand_t &cand) {
@@ -77,8 +79,14 @@ std::optional<pj::ice_sess_cand_t> unpack_candidate(const nlohmann::json &candid
 }
 
 std::optional<std::vector<pj::ice_sess_cand_t>> unpack_candidates(const nlohmann::json &candidates) {
+  if(candidates.is_null()) {
+    err::set("no remote candidates");
+
+    return std::nullopt;
+  }
+
   std::vector<pj::ice_sess_cand_t> result;
-  result.reserve((std::size_t)std::distance(std::begin(candidates), std::end(candidates)));
+  result.reserve(candidates.size());
 
   for(auto &candidate : candidates) {
     auto unpacked = unpack_candidate(candidate);
@@ -93,7 +101,7 @@ std::optional<std::vector<pj::ice_sess_cand_t>> unpack_candidates(const nlohmann
   return result;
 }
 
-std::optional<nlohmann::json> pack(const pj::remote_t &remote) {
+std::optional<nlohmann::json> pack_remote(const pj::remote_t &remote) {
   nlohmann::json json;
 
   auto &creds = remote.creds;
@@ -114,35 +122,28 @@ std::optional<nlohmann::json> pack(const pj::remote_t &remote) {
   return json;
 }
 
-std::optional<pj::remote_buf_t> unpack_remote(const nlohmann::json &json) {
-  auto json_ = nlohmann::json::parse(json.get<std::string>());
+std::vector<uuid_t> unpack_peers(const nlohmann::json &peers_json) {
+  std::vector<uuid_t> peers;
+  peers.reserve(peers_json.size());
 
-  auto candidates = unpack_candidates(json_["candidates"]);
+  for(auto &peer : peers_json) {
+    peers.emplace_back(*util::from_hex<uuid_t>(peer.get<std::string_view>()));
+  }
+
+  return peers;
+}
+
+std::optional<pj::remote_buf_t> unpack_remote(const nlohmann::json &json) {
+  auto candidates = unpack_candidates(json["candidates"]);
   if(!candidates) {
     return std::nullopt;
   }
 
   return pj::remote_buf_t {
     {
-      json_["ufrag"].get<std::string>(),
-      json_["passwd"].get<std::string>()
+      json["ufrag"].get<std::string>(),
+      json["passwd"].get<std::string>()
     },
     std::move(*candidates)
   };
-}
-
-std::optional<std::vector<pj::remote_buf_t>> unpack(const nlohmann::json &json) {
-  std::vector<pj::remote_buf_t> buf;
-
-  for(auto &json_remote : json) {
-    auto remote = unpack_remote(json_remote);
-
-    if(!remote) {
-      return std::nullopt;
-    }
-
-    buf.emplace_back(std::move(*remote));
-  }
-
-  return buf;
 }
