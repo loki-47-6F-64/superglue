@@ -1,5 +1,6 @@
 package com.loki.superglue.djinni.bluecast;
 
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -61,7 +62,6 @@ public class Bluetooth extends BluetoothGattCallback {
                 .setContentTitle("Beacons detected")
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentText("You are in a region of beacons")
-                .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         btAdap = BluetoothAdapter.getDefaultAdapter();
@@ -74,6 +74,10 @@ public class Bluetooth extends BluetoothGattCallback {
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
 
         beaconConsumer = beaconConsumerImpl();
+    }
+
+    public void setOnBeaconNotificationTap(PendingIntent pIntent) {
+        notification.setContentIntent(pIntent);
     }
 
     private BlueController blueController() {
