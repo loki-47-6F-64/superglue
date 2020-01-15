@@ -11,7 +11,7 @@ autogen
 
 ## Building superglue
 
-1. Download and build git@git.noxqsapp.nl:Loki/superglue-wrap.git
+1. Download and build https://github.com/loki-47-6F-64/superglue
 2. Copy config.json.example to config.json and modify it to your needs.
 3. Execute: superglue init
 4. Execute: superglue external [debug | release]
